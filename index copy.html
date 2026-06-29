@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decentralized Referral Network - DRN</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --accent-color: #ec4899;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+            --gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .network-badge {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .connect-btn, .disconnect-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .connect-btn {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+        }
+
+        .disconnect-btn {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+        }
+
+        .disconnect-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .wallet-info {
+            background: var(--bg-card);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: rgba(99, 102, 241, 0.1);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .address-cell {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .copy-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        /* Rank Badge */
+        .rank-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .rank-distributor {
+            background: rgba(148, 163, 184, 0.2);
+            color: #cbd5e1;
+        }
+
+        .rank-silver {
+            background: rgba(200, 200, 200, 0.2);
+            color: #e2e8f0;
+        }
+
+        .rank-gold {
+            background: rgba(245, 158, 11, 0.2);
+            color: #fbbf24;
+        }
+
+        .rank-diamond {
+            background: rgba(6, 182, 212, 0.2);
+            color: #22d3ee;
+        }
+
+        /* Network Visualization */
+        .network-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .tree-node {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+            border-left: 4px solid var(--primary-color);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-left: 0;
+        }
+
+        .tree-node.child {
+            margin-left: 2rem;
+            border-left-color: var(--secondary-color);
+        }
+
+        .node-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .node-address {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: var(--primary-color);
+        }
+
+        .node-info {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+        }
+
+        .alert-info {
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid var(--primary-color);
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0;
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .tab-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+
+            .tree-node.child {
+                margin-left: 1rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-container">
+            <div class="logo">
+                🌐 Decentralized Referral Network
+            </div>
+            <div class="header-actions">
+                <div class="network-badge" id="networkBadge">
+                    ✓ BSC Testnet
+                </div>
+                <div class="wallet-info" id="walletInfo" style="display: none;">
+                    <strong>Wallet:</strong> <span id="walletAddress"></span>
+                </div>
+                <button class="connect-btn" id="connectBtn" onclick="connectWallet()">
+                    Connect Wallet
+                </button>
+                <button class="disconnect-btn" id="disconnectBtn" style="display: none;" onclick="disconnectWallet()">
+                    Disconnect
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Alerts -->
+        <div id="alertContainer"></div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="tab-btn" onclick="switchTab('register')">📝 Register</button>
+            <button class="tab-btn" onclick="switchTab('referral')">🔗 Referral</button>
+            <button class="tab-btn" onclick="switchTab('network')">🌳 My Network</button>
+            <button class="tab-btn" onclick="switchTab('explore')">👥 Explore</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Registration Status</div>
+                    <div class="stat-value" id="statusValue">-</div>
+                    <div class="stat-badge" id="statusBadge"></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Current Rank</div>
+                    <div class="stat-value" id="rankValue">-</div>
+                    <span class="rank-badge rank-distributor" id="rankBadge">Distributor</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Direct Referrals</div>
+                    <div class="stat-value" id="directRefValue">0</div>
+                    <div class="stat-badge">Active</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Users in Network</div>
+                    <div class="stat-value" id="totalUsersValue">0</div>
+                    <div class="stat-badge">Growing</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Your Profile</div>
+                <div id="profileContent">
+                    <p style="color: var(--text-secondary);">Connect your wallet to view profile</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Rank Progression</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Direct Referrals Required</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="rank-badge rank-distributor">Distributor</span></td>
+                            <td>0+</td>
+                            <td id="dist-status">-</td>
+                        </tr>
+                        <tr>
+                            <td><span class="rank-badge rank-silver">Silver</span></td>
+                            <td>2+</td>
+                            <td id="silver-status">-</td>
+                        </tr>
+                        <tr>
+                            <td><span class="rank-badge rank-gold">Gold</span></td>
+                            <td>4+</td>
+                            <td id="gold-status">-</td>
+                        </tr>
+                        <tr>
+                            <td><span class="rank-badge rank-diamond">Diamond</span></td>
+                            <td>6+</td>
+                            <td id="diamond-status">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Register Tab -->
+        <div id="register" class="tab-content">
+            <div class="card">
+                <div class="card-title">Register in Network</div>
+                <div class="card-subtitle">Join the decentralized referral network by providing a valid referrer address</div>
+
+                <div class="form-group">
+                    <label class="form-label">Referrer Address</label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="referrerInput" 
+                        placeholder="0x..."
+                        disabled
+                    >
+                    <small style="color: var(--text-secondary); margin-top: 0.5rem; display: block;">
+                        Enter the Ethereum address of your referrer
+                    </small>
+                </div>
+
+                <button class="btn btn-primary" id="registerBtn" onclick="registerUser()" disabled>
+                    Register Now
+                </button>
+
+                <div id="registerStatus" style="margin-top: 1rem;"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">How to Register</div>
+                <ol style="margin-left: 1.5rem; color: var(--text-secondary);">
+                    <li style="margin-bottom: 0.5rem;">Connect your MetaMask wallet</li>
+                    <li style="margin-bottom: 0.5rem;">Enter a valid referrer address (must be registered)</li>
+                    <li style="margin-bottom: 0.5rem;">Click the "Register Now" button</li>
+                    <li style="margin-bottom: 0.5rem;">Confirm the transaction in MetaMask</li>
+                    <li>You're now part of the network!</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Referral Tab -->
+        <div id="referral" class="tab-content">
+            <div class="card">
+                <div class="card-title">Your Referral Link & Code</div>
+                <div class="card-subtitle">Share this with others to invite them to the network</div>
+
+                <div class="form-group">
+                    <label class="form-label">Your Wallet Address (Use as Referrer)</label>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <input 
+                            type="text" 
+                            class="form-input" 
+                            id="myAddressInput" 
+                            readonly
+                            style="flex: 1;"
+                        >
+                        <button class="btn btn-secondary" onclick="copyToClipboard('myAddressInput')">
+                            📋 Copy
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Share Your Address</label>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        Others can use your address as the referrer address when registering
+                    </p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Your Direct Referrals</div>
+                <div id="referralsContent">
+                    <p style="color: var(--text-secondary);">Connect your wallet to view referrals</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Network Tab -->
+        <div id="network" class="tab-content">
+            <div class="card">
+                <div class="card-title">Your Referral Network Tree</div>
+                <div class="card-subtitle">View your direct referrals and their information</div>
+                <div id="networkContent">
+                    <p style="color: var(--text-secondary);">Connect your wallet to view your network</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Explore Tab -->
+        <div id="explore" class="tab-content">
+            <div class="card">
+                <div class="card-title">Browse All Users</div>
+                <div class="card-subtitle">View all registered users in the network</div>
+                
+                <div class="form-group">
+                    <label class="form-label">Search & Pagination</label>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <input 
+                            type="number" 
+                            class="form-input" 
+                            id="pageInput" 
+                            value="0"
+                            min="0"
+                            style="flex: 0.3;"
+                            placeholder="Page"
+                        >
+                        <button class="btn btn-secondary" onclick="loadMoreUsers()">
+                            Load Users
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Address</th>
+                                <th>Direct Referrals</th>
+                                <th>Rank</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-secondary);">
+                                    Click "Load Users" to fetch data from blockchain
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Contract Configuration
+        const CONTRACT_ADDRESS = '0x5020Fe2B8FF602168cFe19716959472EA0CfE23c';
+        const CONTRACT_ABI = [
+            {
+                "inputs": [{"internalType": "address", "name": "referrer", "type": "address"}],
+                "name": "register",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
+                "name": "getUser",
+                "outputs": [
+                    {"internalType": "bool", "name": "registered", "type": "bool"},
+                    {"internalType": "address", "name": "referrer", "type": "address"},
+                    {"internalType": "uint32", "name": "directReferrals", "type": "uint32"},
+                    {"internalType": "uint8", "name": "rank", "type": "uint8"}
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
+                "name": "getRank",
+                "outputs": [{"internalType": "uint8", "name": "", "type": "uint8"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
+                "name": "isRegistered",
+                "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
+                "name": "getReferrer",
+                "outputs": [{"internalType": "address", "name": "", "type": "address"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
+                "name": "getChildren",
+                "outputs": [{"internalType": "address[]", "name": "", "type": "address[]"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "account", "type": "address"}],
+                "name": "getChildrenCount",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "totalUsers",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getAllUsersLength",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {"internalType": "uint256", "name": "start", "type": "uint256"},
+                    {"internalType": "uint256", "name": "limit", "type": "uint256"}
+                ],
+                "name": "getUsers",
+                "outputs": [{"internalType": "address[]", "name": "result", "type": "address[]"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "address", "name": "user", "type": "address"},
+                    {"indexed": true, "internalType": "address", "name": "referrer", "type": "address"}
+                ],
+                "name": "UserRegistered",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "address", "name": "user", "type": "address"},
+                    {"indexed": false, "internalType": "uint8", "name": "rank", "type": "uint8"}
+                ],
+                "name": "RankUpdated",
+                "type": "event"
+            }
+        ];
+
+        const RANK_NAMES = ['Distributor', 'Silver', 'Gold', 'Diamond'];
+        const RANK_CLASSES = ['rank-distributor', 'rank-silver', 'rank-gold', 'rank-diamond'];
+
+        let web3;
+        let contract;
+        let currentAccount = null;
+
+        // Initialize Web3
+        async function initWeb3() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    web3 = new Web3(window.ethereum);
+                    contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+                    return true;
+                } catch (error) {
+                    showAlert('Web3 initialization failed', 'error');
+                    return false;
+                }
+            } else {
+                showAlert('Please install MetaMask', 'error');
+                return false;
+            }
+        }
+
+        // Connect Wallet
+        async function connectWallet() {
+            try {
+                const accounts = await window.ethereum.request({
+                    method: 'eth_requestAccounts'
+                });
+
+                currentAccount = accounts[0];
+
+                // Check network
+                const chainId = await web3.eth.getChainId();
+                if (chainId !== 97) { // BSC Testnet
+                    await switchNetwork();
+                }
+
+                updateUI();
+                showAlert('Wallet connected successfully!', 'success');
+            } catch (error) {
+                showAlert('Failed to connect wallet: ' + error.message, 'error');
+            }
+        }
+
+        // Disconnect Wallet
+        function disconnectWallet() {
+            currentAccount = null;
+            updateUI();
+            showAlert('Wallet disconnected', 'info');
+        }
+
+        // Switch Network to BSC Testnet
+        async function switchNetwork() {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x61' }] // BSC Testnet
+                });
+            } catch (error) {
+                // Network not added, try adding it
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [{
+                            chainId: '0x61',
+                            chainName: 'BSC Testnet',
+                            nativeCurrency: {
+                                name: 'BNB',
+                                symbol: 'BNB',
+                                decimals: 18
+                            },
+                            rpcUrls: ['https://bsc-testnet.drpc.org'],
+                            blockExplorerUrls: ['https://testnet.bscscan.com']
+                        }]
+                    });
+                } catch (addError) {
+                    showAlert('Failed to switch network', 'error');
+                }
+            }
+        }
+
+        // Update UI
+        async function updateUI() {
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            const walletInfo = document.getElementById('walletInfo');
+            const walletAddress = document.getElementById('walletAddress');
+
+            if (currentAccount) {
+                connectBtn.style.display = 'none';
+                disconnectBtn.style.display = 'block';
+                walletInfo.style.display = 'block';
+                walletAddress.textContent = shortenAddress(currentAccount);
+
+                document.getElementById('myAddressInput').value = currentAccount;
+                document.getElementById('referrerInput').disabled = false;
+                document.getElementById('registerBtn').disabled = false;
+
+                await updateDashboard();
+                await updateReferralInfo();
+                await updateNetworkInfo();
+                await loadTotalUsers();
+            } else {
+                connectBtn.style.display = 'block';
+                disconnectBtn.style.display = 'none';
+                walletInfo.style.display = 'none';
+                document.getElementById('referrerInput').disabled = true;
+                document.getElementById('registerBtn').disabled = true;
+
+                resetDashboard();
+            }
+        }
+
+        // Update Dashboard
+        async function updateDashboard() {
+            try {
+                const user = await contract.methods.getUser(currentAccount).call();
+                
+                const statusValue = document.getElementById('statusValue');
+                const statusBadge = document.getElementById('statusBadge');
+                const rankValue = document.getElementById('rankValue');
+                const rankBadge = document.getElementById('rankBadge');
+                const directRefValue = document.getElementById('directRefValue');
+
+                if (user.registered) {
+                    statusValue.textContent = 'Registered';
+                    statusBadge.innerHTML = '✓ Active Member';
+                    rankValue.textContent = RANK_NAMES[user.rank];
+                    rankBadge.className = 'rank-badge ' + RANK_CLASSES[user.rank];
+                    rankBadge.textContent = RANK_NAMES[user.rank];
+                    directRefValue.textContent = user.directReferrals;
+
+                    // Update rank progression
+                    updateRankProgression(user.directReferrals);
+
+                    // Display profile info
+                    displayProfile(user);
+                } else {
+                    statusValue.textContent = 'Not Registered';
+                    statusBadge.innerHTML = '⚠ Not Yet Registered';
+                    resetProfile();
+                }
+            } catch (error) {
+                console.error('Error updating dashboard:', error);
+                showAlert('Failed to load dashboard data', 'error');
+            }
+        }
+
+        // Display Profile
+        function displayProfile(user) {
+            const profileContent = document.getElementById('profileContent');
+            profileContent.innerHTML = `
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="color: var(--text-secondary); padding: 0.5rem 0;">Wallet Address:</td>
+                        <td style="padding: 0.5rem 0;"><span class="address-cell">${currentAccount}</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color: var(--text-secondary); padding: 0.5rem 0;">Registration Status:</td>
+                        <td style="padding: 0.5rem 0;"><span style="color: var(--success-color);">✓ Registered</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color: var(--text-secondary); padding: 0.5rem 0;">Current Rank:</td>
+                        <td style="padding: 0.5rem 0;"><span class="rank-badge ${RANK_CLASSES[user.rank]}">${RANK_NAMES[user.rank]}</span></td>
+                    </tr>
+                    <tr>
+                        <td style="color: var(--text-secondary); padding: 0.5rem 0;">Direct Referrals:</td>
+                        <td style="padding: 0.5rem 0; font-weight: bold; color: var(--primary-color);">${user.directReferrals}</td>
+                    </tr>
+                    <tr>
+                        <td style="color: var(--text-secondary); padding: 0.5rem 0;">Referrer Address:</td>
+                        <td style="padding: 0.5rem 0;"><span class="address-cell">${shortenAddress(user.referrer)}</span></td>
+                    </tr>
+                </table>
+            `;
+        }
+
+        // Update Rank Progression
+        function updateRankProgression(directReferrals) {
+            const statuses = {
+                'dist-status': directReferrals >= 0 ? '✓ Achieved' : 'Not Yet',
+                'silver-status': directReferrals >= 2 ? '✓ Achieved' : `${2 - directReferrals} more needed`,
+                'gold-status': directReferrals >= 4 ? '✓ Achieved' : `${4 - directReferrals} more needed`,
+                'diamond-status': directReferrals >= 6 ? '✓ Achieved' : `${6 - directReferrals} more needed`
+            };
+
+            Object.keys(statuses).forEach(key => {
+                const elem = document.getElementById(key);
+                if (elem) {
+                    elem.textContent = statuses[key];
+                    elem.style.color = statuses[key].includes('✓') ? 'var(--success-color)' : 'var(--text-secondary)';
+                }
+            });
+        }
+
+        // Reset Profile
+        function resetProfile() {
+            const profileContent = document.getElementById('profileContent');
+            profileContent.innerHTML = '<p style="color: var(--text-secondary);">Register to view detailed profile information</p>';
+        }
+
+        // Reset Dashboard
+        function resetDashboard() {
+            document.getElementById('statusValue').textContent = '-';
+            document.getElementById('statusBadge').innerHTML = '';
+            document.getElementById('rankValue').textContent = '-';
+            document.getElementById('rankBadge').className = 'rank-badge rank-distributor';
+            document.getElementById('rankBadge').textContent = 'Not Registered';
+            document.getElementById('directRefValue').textContent = '0';
+            resetProfile();
+        }
+
+        // Update Referral Info
+        async function updateReferralInfo() {
+            try {
+                const children = await contract.methods.getChildren(currentAccount).call();
+                const referralsContent = document.getElementById('referralsContent');
+
+                if (children.length === 0) {
+                    referralsContent.innerHTML = '<p style="color: var(--text-secondary);">You don\'t have any direct referrals yet. Share your address to invite others!</p>';
+                } else {
+                    let html = `
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Address</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                    `;
+
+                    children.forEach((child, index) => {
+                        html += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td class="address-cell">${shortenAddress(child)}</td>
+                                <td>
+                                    <button class="copy-btn" onclick="copyToClipboard('${child}')">Copy</button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+                    referralsContent.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error fetching referrals:', error);
+            }
+        }
+
+        // Update Network Info
+        async function updateNetworkInfo() {
+            try {
+                const children = await contract.methods.getChildren(currentAccount).call();
+                const networkContent = document.getElementById('networkContent');
+
+                if (children.length === 0) {
+                    networkContent.innerHTML = '<p style="color: var(--text-secondary);">Your network tree will appear here once you have direct referrals.</p>';
+                } else {
+                    let html = '<div class="network-tree">';
+
+                    for (const child of children) {
+                        const childUser = await contract.methods.getUser(child).call();
+                        html += `
+                            <div class="tree-node">
+                                <div class="node-header">
+                                    <span class="node-address">${shortenAddress(child)}</span>
+                                    <span class="rank-badge ${RANK_CLASSES[childUser.rank]}">${RANK_NAMES[childUser.rank]}</span>
+                                </div>
+                                <div class="node-info">
+                                    Direct Referrals: <strong>${childUser.directReferrals}</strong>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    html += '</div>';
+                    networkContent.innerHTML = html;
+                }
+            } catch (error) {
+                console.error('Error fetching network info:', error);
+            }
+        }
+
+        // Load Total Users
+        async function loadTotalUsers() {
+            try {
+                const total = await contract.methods.getAllUsersLength().call();
+                document.getElementById('totalUsersValue').textContent = total;
+            } catch (error) {
+                console.error('Error loading total users:', error);
+            }
+        }
+
+        // Register User
+        async function registerUser() {
+            const referrerInput = document.getElementById('referrerInput');
+            const referrer = referrerInput.value.trim();
+
+            if (!referrer || !web3.utils.isAddress(referrer)) {
+                showAlert('Please enter a valid referrer address', 'error');
+                return;
+            }
+
+            try {
+                const registerBtn = document.getElementById('registerBtn');
+                registerBtn.disabled = true;
+                registerBtn.innerHTML = '<span class="loading"></span> Processing...';
+
+                const tx = await contract.methods.register(referrer).send({
+                    from: currentAccount,
+                    gas: 100000
+                });
+
+                showAlert('Registration successful! Transaction: ' + tx.transactionHash, 'success');
+                referrerInput.value = '';
+                await updateDashboard();
+            } catch (error) {
+                showAlert('Registration failed: ' + error.message, 'error');
+            } finally {
+                const registerBtn = document.getElementById('registerBtn');
+                registerBtn.disabled = false;
+                registerBtn.innerHTML = 'Register Now';
+            }
+        }
+
+        // Load More Users
+        async function loadMoreUsers() {
+            try {
+                const pageInput = document.getElementById('pageInput');
+                const page = parseInt(pageInput.value) || 0;
+                const limit = 10;
+                const start = page * limit;
+
+                const users = await contract.methods.getUsers(start, limit).call();
+                const usersTableBody = document.getElementById('usersTableBody');
+
+                if (users.length === 0) {
+                    usersTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary);">No users found</td></tr>';
+                    return;
+                }
+
+                let html = '';
+                for (let i = 0; i < users.length; i++) {
+                    const user = await contract.methods.getUser(users[i]).call();
+                    html += `
+                        <tr>
+                            <td>${start + i + 1}</td>
+                            <td class="address-cell">${shortenAddress(users[i])}</td>
+                            <td>${user.directReferrals}</td>
+                            <td><span class="rank-badge ${RANK_CLASSES[user.rank]}">${RANK_NAMES[user.rank]}</span></td>
+                            <td>
+                                <button class="copy-btn" onclick="copyToClipboard('${users[i]}')">Copy</button>
+                            </td>
+                        </tr>
+                    `;
+                }
+
+                usersTableBody.innerHTML = html;
+
+                // Update page display
+                pageInput.value = page;
+                pageInput.max = Math.ceil((await contract.methods.getAllUsersLength().call()) / limit) - 1;
+            } catch (error) {
+                showAlert('Failed to load users: ' + error.message, 'error');
+            }
+        }
+
+        // Utility Functions
+        function shortenAddress(address) {
+            if (!address) return '-';
+            return address.substring(0, 6) + '...' + address.substring(address.length - 4);
+        }
+
+        function copyToClipboard(elementId) {
+            let text;
+            if (elementId.startsWith('0x')) {
+                text = elementId;
+            } else {
+                text = document.getElementById(elementId).value || document.getElementById(elementId).textContent;
+            }
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showAlert('Copied to clipboard!', 'success');
+            });
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        function showAlert(message, type = 'info') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alertId = 'alert-' + Date.now();
+
+            const alert = document.createElement('div');
+            alert.id = alertId;
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <span>${message}</span>
+                <button class="close-btn" onclick="document.getElementById('${alertId}').remove()">×</button>
+            `;
+
+            alertContainer.appendChild(alert);
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                const element = document.getElementById(alertId);
+                if (element) element.remove();
+            }, 5000);
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', async () => {
+            const initialized = await initWeb3();
+            if (initialized) {
+                await updateUI();
+            }
+        });
+
+        // Listen for account changes
+        window.ethereum?.on('accountsChanged', async (accounts) => {
+            currentAccount = accounts[0] || null;
+            await updateUI();
+        });
+
+        // Listen for chain changes
+        window.ethereum?.on('chainChanged', () => {
+            window.location.reload();
+        });
+    </script>
+
+    <!-- Web3 Library -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+</body>
+</html>
