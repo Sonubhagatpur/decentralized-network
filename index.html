@@ -1,845 +1,2243 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>BFS Matrix Network</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-  --bg:#0f1120;--surface:#151829;--card:#1a1f36;--card2:#1f2540;
-  --border:#262d4a;--primary:#5b6ef5;--pg:linear-gradient(135deg,#5b6ef5,#9b87f5);
-  --accent:#f97316;--green:#22c55e;--red:#ef4444;--gold:#eab308;
-  --text:#e8ecff;--muted:#6b7db3;
-  --blue-card:linear-gradient(135deg,#3b52e0 0%,#5b6ef5 100%);
-}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>BFS Matrix Network</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box
+    }
 
-/* HEADER */
-header{background:rgba(21,24,41,.96);border-bottom:1px solid var(--border);padding:.85rem 1.5rem;position:sticky;top:0;z-index:300;backdrop-filter:blur(14px)}
-.hdr{max-width:1440px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap}
-.logo{font-size:1.3rem;font-weight:800;background:var(--pg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.logo small{display:block;font-size:.7rem;-webkit-text-fill-color:var(--muted);color:var(--muted);font-weight:400;letter-spacing:.4px}
-.hdr-r{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
-.np{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.4);color:#22c55e;padding:.3rem .85rem;border-radius:20px;font-size:.77rem;font-weight:700}
-.wp{background:var(--card2);border:1px solid var(--border);padding:.38rem .9rem;border-radius:8px;font-size:.77rem;font-family:monospace;color:var(--muted);display:none}
-.bcn{background:var(--pg);color:#fff;border:none;padding:.58rem 1.3rem;border-radius:9px;font-weight:700;font-size:.86rem;cursor:pointer;transition:.2s}
-.bcn:hover{opacity:.88;transform:translateY(-1px)}
-.bdc{background:rgba(239,68,68,.1);color:var(--red);border:1px solid rgba(239,68,68,.4);padding:.52rem .95rem;border-radius:9px;font-weight:600;font-size:.8rem;cursor:pointer;display:none;transition:.2s}
-.bdc:hover{background:rgba(239,68,68,.2)}
+    :root {
+      --bg: #0f1120;
+      --surface: #151829;
+      --card: #1a1f36;
+      --card2: #1f2540;
+      --border: #262d4a;
+      --primary: #5b6ef5;
+      --pg: linear-gradient(135deg, #5b6ef5, #9b87f5);
+      --accent: #f97316;
+      --green: #22c55e;
+      --red: #ef4444;
+      --gold: #eab308;
+      --text: #e8ecff;
+      --muted: #6b7db3;
+      --blue-card: linear-gradient(135deg, #3b52e0 0%, #5b6ef5 100%);
+    }
 
-/* LAYOUT */
-.wrap{max-width:1440px;margin:auto;padding:1.5rem}
-#abox{margin-bottom:1rem}
-.al{display:flex;justify-content:space-between;align-items:center;padding:.78rem 1rem;border-radius:9px;margin-bottom:.45rem;font-size:.86rem;animation:fu .3s ease}
-.al-s{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#22c55e}
-.al-e{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:var(--red)}
-.al-i{background:rgba(91,110,245,.1);border:1px solid rgba(91,110,245,.3);color:var(--text)}
-.al .x{background:none;border:none;color:inherit;font-size:1.1rem;cursor:pointer;padding:0 .3rem}
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden
+    }
 
-/* TABS */
-.tabs{display:flex;gap:.2rem;margin-bottom:1.5rem;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:0}
-.tab{padding:.73rem 1.25rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--muted);cursor:pointer;font-weight:600;font-size:.86rem;white-space:nowrap;transition:.2s;margin-bottom:-1px}
-.tab:hover{color:var(--text)}
-.tab.on{color:var(--primary);border-bottom-color:var(--primary)}
-.pane{display:none;animation:fu .3s ease}
-.pane.on{display:block}
+    /* HEADER */
+    header {
+      background: rgba(21, 24, 41, .96);
+      border-bottom: 1px solid var(--border);
+      padding: .85rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 300;
+      backdrop-filter: blur(14px)
+    }
 
-/* CARD */
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.35rem;margin-bottom:1.35rem}
-.card:hover{border-color:rgba(91,110,245,.3)}
-.ct{font-size:1.02rem;font-weight:700;margin-bottom:.28rem}
-.cs{font-size:.8rem;color:var(--muted);margin-bottom:1.1rem}
+    .hdr {
+      max-width: 1440px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap
+    }
 
-/* STATS */
-.sg{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:.9rem;margin-bottom:1.35rem}
-.sc{background:linear-gradient(135deg,rgba(91,110,245,.08),rgba(155,135,245,.03));border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;transition:.2s}
-.sc:hover{border-color:rgba(91,110,245,.4)}
-.sl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.55px;margin-bottom:.35rem}
-.sv{font-size:1.6rem;font-weight:800;background:var(--pg);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.sn{font-size:.72rem;color:var(--muted);margin-top:.18rem}
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 800;
+      background: var(--pg);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text
+    }
 
-/* FORM */
-.fg{margin-bottom:1.1rem}
-.fl{display:block;font-weight:600;font-size:.86rem;margin-bottom:.42rem}
-.fi{width:100%;padding:.68rem .9rem;background:rgba(0,0,0,.28);border:1px solid var(--border);border-radius:9px;color:var(--text);font-size:.88rem;transition:.2s}
-.fi:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(91,110,245,.13)}
-.fi::placeholder{color:var(--muted)}
-.fi:disabled{opacity:.42;cursor:not-allowed}
-.hint{color:var(--muted);font-size:.76rem;margin-top:.28rem;display:block}
+    .logo small {
+      display: block;
+      font-size: .7rem;
+      -webkit-text-fill-color: var(--muted);
+      color: var(--muted);
+      font-weight: 400;
+      letter-spacing: .4px
+    }
 
-/* BUTTONS */
-.btn{padding:.68rem 1.6rem;border:none;border-radius:9px;font-weight:700;cursor:pointer;font-size:.88rem;transition:.2s}
-.bp{background:var(--pg);color:#fff}
-.bp:hover{opacity:.88;transform:translateY(-1px)}
-.bp:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.bg{background:transparent;border:1px solid var(--border);color:var(--text);padding:.5rem .95rem;font-size:.8rem;border-radius:8px;font-weight:600;cursor:pointer;transition:.2s}
-.bg:hover{border-color:var(--primary);background:rgba(91,110,245,.08)}
+    .hdr-r {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      flex-wrap: wrap
+    }
 
-/* TABLE */
-.tw{overflow-x:auto}
-table{width:100%;border-collapse:collapse}
-th{background:rgba(91,110,245,.08);padding:.8rem 1rem;text-align:left;font-weight:700;border-bottom:2px solid var(--border);font-size:.79rem;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
-td{padding:.8rem 1rem;border-bottom:1px solid rgba(38,45,74,.65);color:var(--muted);font-size:.83rem}
-tr:hover td{background:rgba(91,110,245,.04);color:var(--text)}
-.mono{font-family:monospace;font-size:.78rem}
+    .np {
+      background: rgba(34, 197, 94, .1);
+      border: 1px solid rgba(34, 197, 94, .4);
+      color: #22c55e;
+      padding: .3rem .85rem;
+      border-radius: 20px;
+      font-size: .77rem;
+      font-weight: 700
+    }
 
-/* RANK */
-.rank{display:inline-block;padding:.25rem .65rem;border-radius:6px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
-.r0{background:rgba(107,125,179,.15);color:#94a3c8}
-.r1{background:rgba(226,232,240,.1);color:#cbd5e1}
-.r2{background:rgba(234,179,8,.12);color:#eab308}
-.r3{background:rgba(6,182,212,.12);color:#22d3ee}
+    .wp {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      padding: .38rem .9rem;
+      border-radius: 8px;
+      font-size: .77rem;
+      font-family: monospace;
+      color: var(--muted);
+      display: none
+    }
 
-/* ══════════════ MATRIX CARD (matches screenshot) ══════════════ */
-.mc{background:var(--blue-card);border-radius:18px;padding:1.6rem 1.4rem;margin-bottom:1.35rem;position:relative;overflow:hidden}
-.mc::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='0.03'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");pointer-events:none}
-.mhdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.4rem;position:relative}
-.mlvl{font-size:.95rem;font-weight:700;color:rgba(255,255,255,.55)}
-.mid{font-size:.95rem;font-weight:700;color:#fff;text-align:center}
-.mcoins{display:flex;align-items:center;gap:.4rem;font-size:1.05rem;font-weight:800;color:#fff}
-.ci{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ea580c);display:flex;align-items:center;justify-content:center;font-size:.7rem;box-shadow:0 2px 8px rgba(245,158,11,.4)}
+    .bcn {
+      background: var(--pg);
+      color: #fff;
+      border: none;
+      padding: .58rem 1.3rem;
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: .86rem;
+      cursor: pointer;
+      transition: .2s
+    }
 
-/* TREE */
-.tw2{display:flex;flex-direction:column;align-items:center;gap:0;position:relative}
-.tr{display:flex;justify-content:center;gap:1.15rem;z-index:2;position:relative}
-.ts{height:24px;width:100%;position:relative;z-index:1}
+    .bcn:hover {
+      opacity: .88;
+      transform: translateY(-1px)
+    }
 
-/* SVG lines */
-.tsv{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+    .bdc {
+      background: rgba(239, 68, 68, .1);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, .4);
+      padding: .52rem .95rem;
+      border-radius: 9px;
+      font-weight: 600;
+      font-size: .8rem;
+      cursor: pointer;
+      display: none;
+      transition: .2s
+    }
 
-/* NODE */
-.nd{display:flex;flex-direction:column;align-items:center;cursor:pointer;transition:.2s;position:relative}
-.nd:hover{transform:scale(1.06)}
-.nc{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.92rem;transition:.2s;position:relative;border:3px solid transparent;user-select:none;flex-shrink:0}
+    .bdc:hover {
+      background: rgba(239, 68, 68, .2)
+    }
 
-/* node states */
-.n-e{background:rgba(255,255,255,.06);border:2px dashed rgba(255,255,255,.18);color:rgba(255,255,255,.25)}
-.n-f{background:#fff;color:#1a1f36}
-.n-s{background:#fff;color:#1a1f36;border:3px solid #22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.28),0 0 18px rgba(34,197,94,.18)}
-.n-a{background:var(--accent);color:#fff;border:3px solid var(--gold);box-shadow:0 0 0 3px rgba(249,115,22,.28)}
-.n-r{background:rgba(34,197,94,.18);color:#22c55e;border:2px solid rgba(34,197,94,.5);box-shadow:0 0 0 2px rgba(34,197,94,.15)}
+    /* LAYOUT */
+    .wrap {
+      max-width: 1440px;
+      margin: auto;
+      padding: 1.5rem
+    }
 
-.nlbl{font-size:.68rem;color:rgba(255,255,255,.5);margin-top:.22rem;text-align:center;max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    #abox {
+      margin-bottom: 1rem
+    }
 
-/* Tooltip */
-.tip{position:absolute;bottom:108%;left:50%;transform:translateX(-50%);background:#090c1a;border:1px solid var(--border);border-radius:8px;padding:.45rem .75rem;font-size:.7rem;white-space:nowrap;z-index:99;pointer-events:none;opacity:0;transition:.15s;color:var(--text);min-width:140px;text-align:center}
-.nc:hover .tip{opacity:1}
+    .al {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: .78rem 1rem;
+      border-radius: 9px;
+      margin-bottom: .45rem;
+      font-size: .86rem;
+      animation: fu .3s ease
+    }
 
-/* Footer */
-.mftr{display:flex;justify-content:space-between;margin-top:1.45rem;padding-top:1.15rem;border-top:1px solid rgba(255,255,255,.1);flex-wrap:wrap;gap:.8rem}
-.mfi{text-align:center;min-width:80px}
-.mfl{font-size:.72rem;color:rgba(255,255,255,.48);margin-bottom:.18rem;display:flex;align-items:center;gap:.3rem;justify-content:center}
-.mfv{font-size:1.1rem;font-weight:800;color:#fff}
+    .al-s {
+      background: rgba(34, 197, 94, .1);
+      border: 1px solid rgba(34, 197, 94, .3);
+      color: #22c55e
+    }
 
-/* Recycle queue strip */
-.rqs{display:flex;gap:.45rem;align-items:center;overflow-x:auto;padding:.45rem 0;flex-wrap:nowrap}
-.rqn{min-width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0;text-align:center}
-.rq-head{background:var(--accent);color:#fff;border:2px solid var(--gold);box-shadow:0 0 8px rgba(249,115,22,.3)}
-.rq-reg{background:rgba(91,110,245,.18);color:var(--primary);border:1px solid rgba(91,110,245,.35)}
-.rq-used{background:rgba(107,125,179,.12);color:var(--muted);border:1px solid var(--border)}
-.rqa{color:var(--muted);font-size:.9rem;flex-shrink:0}
-.rqm{color:var(--muted);font-size:.78rem;flex-shrink:0}
+    .al-e {
+      background: rgba(239, 68, 68, .1);
+      border: 1px solid rgba(239, 68, 68, .3);
+      color: var(--red)
+    }
 
-/* Network node */
-.nn{background:var(--card2);border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:10px;padding:.88rem 1.05rem;margin-bottom:.55rem}
-.nn-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:.28rem}
-.nn-addr{font-family:monospace;font-size:.8rem;color:var(--primary)}
-.nn-stats{font-size:.79rem;color:var(--muted);display:flex;gap:1.1rem;flex-wrap:wrap}
-.nn-stats strong{color:var(--text)}
+    .al-i {
+      background: rgba(91, 110, 245, .1);
+      border: 1px solid rgba(91, 110, 245, .3);
+      color: var(--text)
+    }
 
-/* Fee box */
-.fb{background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.28);border-radius:10px;padding:.88rem 1.05rem;margin-bottom:1.15rem;font-size:.84rem;line-height:1.7}
-.fb strong{color:var(--accent)}
+    .al .x {
+      background: none;
+      border: none;
+      color: inherit;
+      font-size: 1.1rem;
+      cursor: pointer;
+      padding: 0 .3rem
+    }
 
-/* Placement preview box */
-.ppv{background:rgba(91,110,245,.06);border:1px solid rgba(91,110,245,.22);border-radius:10px;padding:1rem;font-size:.84rem}
+    /* TABS */
+    .tabs {
+      display: flex;
+      gap: .2rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 0
+    }
 
-/* Upline chain */
-.uc{display:flex;align-items:center;gap:.42rem;flex-wrap:wrap;font-size:.81rem}
+    .tab {
+      padding: .73rem 1.25rem;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: .86rem;
+      white-space: nowrap;
+      transition: .2s;
+      margin-bottom: -1px
+    }
 
-/* Ref row */
-.rr{display:flex;gap:.7rem;align-items:center}
-.rr .fi{flex:1}
+    .tab:hover {
+      color: var(--text)
+    }
 
-/* Pagination */
-.pg{display:flex;gap:.55rem;align-items:center;margin-bottom:.9rem}
-.pg .fi{width:68px;text-align:center}
+    .tab.on {
+      color: var(--primary);
+      border-bottom-color: var(--primary)
+    }
 
-/* Separator */
-.sep{height:1px;background:var(--border);margin:.9rem 0}
+    .pane {
+      display: none;
+      animation: fu .3s ease
+    }
 
-/* spinner */
-.sp{display:inline-block;width:13px;height:13px;border:2px solid rgba(91,110,245,.28);border-radius:50%;border-top-color:var(--primary);animation:spin .7s linear infinite;vertical-align:middle;margin-right:.35rem}
+    .pane.on {
+      display: block
+    }
 
-/* dot */
-.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:.35rem}
-.dg{background:var(--green)}.dr{background:var(--red)}.dy{background:var(--gold)}
+    /* CARD */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.35rem;
+      margin-bottom: 1.35rem
+    }
 
-@keyframes fu{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
-@keyframes spin{to{transform:rotate(360deg)}}
+    .card:hover {
+      border-color: rgba(91, 110, 245, .3)
+    }
 
-@media(max-width:640px){
-  .sg{grid-template-columns:1fr 1fr}
-  .nc{width:50px;height:50px;font-size:.8rem}
-  .tr{gap:.7rem}
-  .mftr{justify-content:space-around}
-}
-</style>
+    .ct {
+      font-size: 1.02rem;
+      font-weight: 700;
+      margin-bottom: .28rem
+    }
+
+    .cs {
+      font-size: .8rem;
+      color: var(--muted);
+      margin-bottom: 1.1rem
+    }
+
+    /* STATS */
+    .sg {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(148px, 1fr));
+      gap: .9rem;
+      margin-bottom: 1.35rem
+    }
+
+    .sc {
+      background: linear-gradient(135deg, rgba(91, 110, 245, .08), rgba(155, 135, 245, .03));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      transition: .2s
+    }
+
+    .sc:hover {
+      border-color: rgba(91, 110, 245, .4)
+    }
+
+    .sl {
+      font-size: .7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .55px;
+      margin-bottom: .35rem
+    }
+
+    .sv {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: var(--pg);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text
+    }
+
+    .sn {
+      font-size: .72rem;
+      color: var(--muted);
+      margin-top: .18rem
+    }
+
+    /* FORM */
+    .fg {
+      margin-bottom: 1.1rem
+    }
+
+    .fl {
+      display: block;
+      font-weight: 600;
+      font-size: .86rem;
+      margin-bottom: .42rem
+    }
+
+    .fi {
+      width: 100%;
+      padding: .68rem .9rem;
+      background: rgba(0, 0, 0, .28);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      color: var(--text);
+      font-size: .88rem;
+      transition: .2s
+    }
+
+    .fi:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(91, 110, 245, .13)
+    }
+
+    .fi::placeholder {
+      color: var(--muted)
+    }
+
+    .fi:disabled {
+      opacity: .42;
+      cursor: not-allowed
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: .76rem;
+      margin-top: .28rem;
+      display: block
+    }
+
+    /* BUTTONS */
+    .btn {
+      padding: .68rem 1.6rem;
+      border: none;
+      border-radius: 9px;
+      font-weight: 700;
+      cursor: pointer;
+      font-size: .88rem;
+      transition: .2s
+    }
+
+    .bp {
+      background: var(--pg);
+      color: #fff
+    }
+
+    .bp:hover {
+      opacity: .88;
+      transform: translateY(-1px)
+    }
+
+    .bp:disabled {
+      opacity: .4;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .bg {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: .5rem .95rem;
+      font-size: .8rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s
+    }
+
+    .bg:hover {
+      border-color: var(--primary);
+      background: rgba(91, 110, 245, .08)
+    }
+
+    /* TABLE */
+    .tw {
+      overflow-x: auto
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    th {
+      background: rgba(91, 110, 245, .08);
+      padding: .8rem 1rem;
+      text-align: left;
+      font-weight: 700;
+      border-bottom: 2px solid var(--border);
+      font-size: .79rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .4px
+    }
+
+    td {
+      padding: .8rem 1rem;
+      border-bottom: 1px solid rgba(38, 45, 74, .65);
+      color: var(--muted);
+      font-size: .83rem
+    }
+
+    tr:hover td {
+      background: rgba(91, 110, 245, .04);
+      color: var(--text)
+    }
+
+    .mono {
+      font-family: monospace;
+      font-size: .78rem
+    }
+
+    /* RANK */
+    .rank {
+      display: inline-block;
+      padding: .25rem .65rem;
+      border-radius: 6px;
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .4px
+    }
+
+    .r0 {
+      background: rgba(107, 125, 179, .15);
+      color: #94a3c8
+    }
+
+    .r1 {
+      background: rgba(226, 232, 240, .1);
+      color: #cbd5e1
+    }
+
+    .r2 {
+      background: rgba(234, 179, 8, .12);
+      color: #eab308
+    }
+
+    .r3 {
+      background: rgba(6, 182, 212, .12);
+      color: #22d3ee
+    }
+
+    /* ══════════════ MATRIX CARD (matches screenshot) ══════════════ */
+    .mc {
+      background: var(--blue-card);
+      border-radius: 18px;
+      padding: 1.6rem 1.4rem;
+      margin-bottom: 1.35rem;
+      position: relative;
+      overflow: hidden
+    }
+
+    .mc::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='0.03'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none
+    }
+
+    .mhdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.4rem;
+      position: relative
+    }
+
+    .mlvl {
+      font-size: .95rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, .55)
+    }
+
+    .mid {
+      font-size: .95rem;
+      font-weight: 700;
+      color: #fff;
+      text-align: center
+    }
+
+    .mcoins {
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #fff
+    }
+
+    .ci {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f59e0b, #ea580c);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .7rem;
+      box-shadow: 0 2px 8px rgba(245, 158, 11, .4)
+    }
+
+    /* TREE */
+    .tw2 {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      position: relative
+    }
+
+    .tr {
+      display: flex;
+      justify-content: center;
+      gap: 1.15rem;
+      z-index: 2;
+      position: relative
+    }
+
+    .ts {
+      height: 24px;
+      width: 100%;
+      position: relative;
+      z-index: 1
+    }
+
+    /* SVG lines */
+    .tsv {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible
+    }
+
+    /* NODE */
+    .nd {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: .2s;
+      position: relative
+    }
+
+    .nd:hover {
+      transform: scale(1.06)
+    }
+
+    .nc {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: .92rem;
+      transition: .2s;
+      position: relative;
+      border: 3px solid transparent;
+      user-select: none;
+      flex-shrink: 0
+    }
+
+    /* node states */
+    .n-e {
+      background: rgba(255, 255, 255, .06);
+      border: 2px dashed rgba(255, 255, 255, .18);
+      color: rgba(255, 255, 255, .25)
+    }
+
+    .n-f {
+      background: #fff;
+      color: #1a1f36
+    }
+
+    .n-s {
+      background: #fff;
+      color: #1a1f36;
+      border: 3px solid #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, .28), 0 0 18px rgba(34, 197, 94, .18)
+    }
+
+    .n-a {
+      background: var(--accent);
+      color: #fff;
+      border: 3px solid var(--gold);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, .28)
+    }
+
+    .n-r {
+      background: rgba(34, 197, 94, .18);
+      color: #22c55e;
+      border: 2px solid rgba(34, 197, 94, .5);
+      box-shadow: 0 0 0 2px rgba(34, 197, 94, .15)
+    }
+
+    .nlbl {
+      font-size: .68rem;
+      color: rgba(255, 255, 255, .5);
+      margin-top: .22rem;
+      text-align: center;
+      max-width: 66px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    /* Tooltip */
+    .tip {
+      position: absolute;
+      bottom: 108%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #090c1a;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .45rem .75rem;
+      font-size: .7rem;
+      white-space: nowrap;
+      z-index: 99;
+      pointer-events: none;
+      opacity: 0;
+      transition: .15s;
+      color: var(--text);
+      min-width: 140px;
+      text-align: center
+    }
+
+    .nc:hover .tip {
+      opacity: 1
+    }
+
+    /* Footer */
+    .mftr {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1.45rem;
+      padding-top: 1.15rem;
+      border-top: 1px solid rgba(255, 255, 255, .1);
+      flex-wrap: wrap;
+      gap: .8rem
+    }
+
+    .mfi {
+      text-align: center;
+      min-width: 80px
+    }
+
+    .mfl {
+      font-size: .72rem;
+      color: rgba(255, 255, 255, .48);
+      margin-bottom: .18rem;
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+      justify-content: center
+    }
+
+    .mfv {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff
+    }
+
+    /* Recycle queue strip */
+    .rqs {
+      display: flex;
+      gap: .45rem;
+      align-items: center;
+      overflow-x: auto;
+      padding: .45rem 0;
+      flex-wrap: nowrap
+    }
+
+    .rqn {
+      min-width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: .72rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      text-align: center
+    }
+
+    .rq-head {
+      background: var(--accent);
+      color: #fff;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 8px rgba(249, 115, 22, .3)
+    }
+
+    .rq-reg {
+      background: rgba(91, 110, 245, .18);
+      color: var(--primary);
+      border: 1px solid rgba(91, 110, 245, .35)
+    }
+
+    .rq-used {
+      background: rgba(107, 125, 179, .12);
+      color: var(--muted);
+      border: 1px solid var(--border)
+    }
+
+    .rqa {
+      color: var(--muted);
+      font-size: .9rem;
+      flex-shrink: 0
+    }
+
+    .rqm {
+      color: var(--muted);
+      font-size: .78rem;
+      flex-shrink: 0
+    }
+
+    /* Network node */
+    .nn {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--primary);
+      border-radius: 10px;
+      padding: .88rem 1.05rem;
+      margin-bottom: .55rem
+    }
+
+    .nn-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: .28rem
+    }
+
+    .nn-addr {
+      font-family: monospace;
+      font-size: .8rem;
+      color: var(--primary)
+    }
+
+    .nn-stats {
+      font-size: .79rem;
+      color: var(--muted);
+      display: flex;
+      gap: 1.1rem;
+      flex-wrap: wrap
+    }
+
+    .nn-stats strong {
+      color: var(--text)
+    }
+
+    /* Fee box */
+    .fb {
+      background: rgba(249, 115, 22, .06);
+      border: 1px solid rgba(249, 115, 22, .28);
+      border-radius: 10px;
+      padding: .88rem 1.05rem;
+      margin-bottom: 1.15rem;
+      font-size: .84rem;
+      line-height: 1.7
+    }
+
+    .fb strong {
+      color: var(--accent)
+    }
+
+    /* Placement preview box */
+    .ppv {
+      background: rgba(91, 110, 245, .06);
+      border: 1px solid rgba(91, 110, 245, .22);
+      border-radius: 10px;
+      padding: 1rem;
+      font-size: .84rem
+    }
+
+    /* Upline chain */
+    .uc {
+      display: flex;
+      align-items: center;
+      gap: .42rem;
+      flex-wrap: wrap;
+      font-size: .81rem
+    }
+
+    /* Ref row */
+    .rr {
+      display: flex;
+      gap: .7rem;
+      align-items: center
+    }
+
+    .rr .fi {
+      flex: 1
+    }
+
+    /* Pagination */
+    .pg {
+      display: flex;
+      gap: .55rem;
+      align-items: center;
+      margin-bottom: .9rem
+    }
+
+    .pg .fi {
+      width: 68px;
+      text-align: center
+    }
+
+    /* Separator */
+    .sep {
+      height: 1px;
+      background: var(--border);
+      margin: .9rem 0
+    }
+
+    /* spinner */
+    .sp {
+      display: inline-block;
+      width: 13px;
+      height: 13px;
+      border: 2px solid rgba(91, 110, 245, .28);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: .35rem
+    }
+
+    /* dot */
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: .35rem
+    }
+
+    .dg {
+      background: var(--green)
+    }
+
+    .dr {
+      background: var(--red)
+    }
+
+    .dy {
+      background: var(--gold)
+    }
+
+    @keyframes fu {
+      from {
+        opacity: 0;
+        transform: translateY(7px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg)
+      }
+    }
+
+    @media(max-width:640px) {
+      .sg {
+        grid-template-columns: 1fr 1fr
+      }
+
+      .nc {
+        width: 50px;
+        height: 50px;
+        font-size: .8rem
+      }
+
+      .tr {
+        gap: .7rem
+      }
+
+      .mftr {
+        justify-content: space-around
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-<!-- ════ HEADER ════ -->
-<header>
-  <div class="hdr">
-    <div class="logo">⬡ BFS Matrix<small>Decentralized Network</small></div>
-    <div class="hdr-r">
-      <!-- <div class="np">⬡ Ethereum</div> -->
-      <div class="wp" id="wPill"></div>
-      <button class="bcn" id="btnCon" onclick="connectWallet()">Connect Wallet</button>
-      <button class="bdc" id="btnDis" onclick="disconnectWallet()">Disconnect</button>
-    </div>
-  </div>
-</header>
-
-<div class="wrap">
-<div id="abox"></div>
-
-<!-- TABS -->
-<div class="tabs">
-  <button class="tab on"  onclick="go('dashboard',this)">📊 Dashboard</button>
-  <button class="tab"     onclick="go('matrix',this)">🔷 My Matrix</button>
-  <button class="tab"     onclick="go('register',this)">📝 Register</button>
-  <button class="tab"     onclick="go('referral',this)">🔗 Referral</button>
-  <button class="tab"     onclick="go('network',this)">🌳 Network</button>
-  <button class="tab"     onclick="go('explore',this)">👥 Explore</button>
-</div>
-
-<!-- ════════════════ DASHBOARD ════════════════ -->
-<div id="dashboard" class="pane on">
-  <div class="sg">
-    <div class="sc"><div class="sl">Status</div><div class="sv" id="dSt">—</div><div class="sn" id="dStN">connect wallet</div></div>
-    <div class="sc"><div class="sl">User ID</div><div class="sv" id="dId">—</div><div class="sn">global position</div></div>
-    <div class="sc"><div class="sl">Rank</div><div class="sv" id="dRk">—</div><div class="sn" id="dRkN"></div></div>
-    <div class="sc"><div class="sl">Direct Referrals</div><div class="sv" id="dDr">0</div><div class="sn">sponsored</div></div>
-    <div class="sc"><div class="sl">Cycles</div><div class="sv" id="dCy">0</div><div class="sn">auto-recycles</div></div>
-    <div class="sc"><div class="sl">Total Earned</div><div class="sv" id="dEa">0</div><div class="sn">tBNB</div></div>
-    <div class="sc"><div class="sl">Matrix Partners</div><div class="sv" id="dPa">0</div><div class="sn">downline</div></div>
-    <div class="sc"><div class="sl">Total Users</div><div class="sv" id="dTu">0</div><div class="sn">network wide</div></div>
-  </div>
-
-  <div class="card">
-    <div class="ct">Your Profile</div>
-    <div id="profC"><p style="color:var(--muted)">Connect wallet to view profile</p></div>
-  </div>
-
-  <div class="card">
-    <div class="ct">Rank Progression</div>
-    <div class="tw"><table>
-      <thead><tr><th>Rank</th><th>Direct Refs Required</th><th>Status</th></tr></thead>
-      <tbody>
-        <tr><td><span class="rank r0">Distributor</span></td><td>0+</td><td id="rk0">—</td></tr>
-        <tr><td><span class="rank r1">Silver</span></td><td>2+</td><td id="rk1">—</td></tr>
-        <tr><td><span class="rank r2">Gold</span></td><td>4+</td><td id="rk2">—</td></tr>
-        <tr><td><span class="rank r3">Diamond</span></td><td>6+</td><td id="rk3">—</td></tr>
-      </tbody>
-    </table></div>
-  </div>
-
-  <div class="card">
-    <div class="ct">How BFS Matrix Works</div>
-    <div style="color:var(--muted);font-size:.86rem;line-height:1.8">
-      <p>📌 <strong style="color:var(--text)">Placement:</strong> New users fill the oldest open slot in the entire tree — guaranteed Breadth-First Search order using the binary heap formula: <code style="color:var(--primary)">parent[i] = allUsers[(i-1)/2]</code>.</p><br>
-      <p>💰 <strong style="color:var(--text)">Fee: 0.00001 tBNB</strong> → 100% to your BFS matrix parent. If your placement triggers a cycle on the parent, payment overflows to their parent automatically.</p><br>
-      <p>🔄 <strong style="color:var(--text)">Auto-Recycle:</strong> When a node fills both slots, it resets and re-enters a priority recycle queue. Future placements go to the recycle queue first, then the main BFS order.</p>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════════ MATRIX ════════════════ -->
-<div id="matrix" class="pane">
-  <!-- Blue card matching screenshot -->
-  <div class="mc" id="matrixCard">
-    <div class="mhdr">
-      <div class="mlvl">Lvl 1</div>
-      <div class="mid" id="mCardId">ID —</div>
-      <div class="mcoins">
-        <div class="ci">⬡</div>
-        <span id="mCoinCnt">0</span>
+  <!-- ════ HEADER ════ -->
+  <header>
+    <div class="hdr">
+      <div class="logo">⬡ BFS Matrix<small>Decentralized Network</small></div>
+      <div class="hdr-r">
+        <!-- <div class="np">⬡ Ethereum</div> -->
+        <div class="wp" id="wPill"></div>
+        <button class="bcn" id="btnCon" onclick="connectWallet()">Connect Wallet</button>
+        <button class="bdc" id="btnDis" onclick="disconnectWallet()">Disconnect</button>
       </div>
     </div>
-    <div class="tw2" id="treeWrap">
-      <p style="color:rgba(255,255,255,.45)">Connect wallet and register to view your matrix</p>
+  </header>
+
+  <div class="wrap">
+    <div id="abox"></div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab on" onclick="go('dashboard',this)">📊 Dashboard</button>
+      <button class="tab" onclick="go('matrix',this)">🔷 My Matrix</button>
+      <button class="tab" onclick="go('register',this)">📝 Register</button>
+      <button class="tab" onclick="go('referral',this)">🔗 Referral</button>
+      <button class="tab" onclick="go('network',this)">🌳 Network</button>
+      <button class="tab" onclick="go('explore',this)">👥 Explore</button>
     </div>
-    <div class="mftr">
-      <div class="mfi"><div class="mfl">👥 Partners</div><div class="mfv" id="mPart">0</div></div>
-      <div class="mfi"><div class="mfl">🔄 Cycles</div><div class="mfv" id="mCyc">0</div></div>
-      <div class="mfi"><div class="mfl">💎 Total revenue</div><div class="mfv" id="mRev">0 tBNB</div></div>
-    </div>
-  </div>
 
-  <!-- Recycle queue -->
-  <div class="card">
-    <div class="ct">Recycle Queue</div>
-    <div class="cs">Nodes that completed a cycle — they have placement priority over new BFS positions</div>
-    <div id="rcqVis"><p style="color:var(--muted)">Connect wallet to view</p></div>
-  </div>
+    <!-- ════════════════ DASHBOARD ════════════════ -->
+    <div id="dashboard" class="pane on">
+      <div class="sg">
+        <div class="sc">
+          <div class="sl">Status</div>
+          <div class="sv" id="dSt">—</div>
+          <div class="sn" id="dStN">connect wallet</div>
+        </div>
+        <div class="sc">
+          <div class="sl">User ID</div>
+          <div class="sv" id="dId">—</div>
+          <div class="sn">global position</div>
+        </div>
+        <div class="sc">
+          <div class="sl">Rank</div>
+          <div class="sv" id="dRk">—</div>
+          <div class="sn" id="dRkN"></div>
+        </div>
+        <div class="sc">
+          <div class="sl">Direct Referrals</div>
+          <div class="sv" id="dDr">0</div>
+          <div class="sn">sponsored</div>
+        </div>
+        <div class="sc">
+          <div class="sl">Cycles</div>
+          <div class="sv" id="dCy">0</div>
+          <div class="sn">auto-recycles</div>
+        </div>
+        <div class="sc">
+          <div class="sl">Total Earned</div>
+          <div class="sv" id="dEa">0</div>
+          <div class="sn">tBNB</div>
+        </div>
+        <div class="sc">
+          <div class="sl">Matrix Partners</div>
+          <div class="sv" id="dPa">0</div>
+          <div class="sn">downline</div>
+        </div>
+        <div class="sc">
+          <div class="sl">Total Users</div>
+          <div class="sv" id="dTu">0</div>
+          <div class="sn">network wide</div>
+        </div>
+      </div>
 
-  <!-- Upline chain -->
-  <div class="card">
-    <div class="ct">Your Matrix Upline Chain</div>
-    <div class="cs">From your BFS parent up to root</div>
-    <div id="uplineC"><p style="color:var(--muted)">—</p></div>
-  </div>
-</div>
+      <div class="card">
+        <div class="ct">Your Profile</div>
+        <div id="profC">
+          <p style="color:var(--muted)">Connect wallet to view profile</p>
+        </div>
+      </div>
 
-<!-- ════════════════ REGISTER ════════════════ -->
-<div id="register" class="pane">
-  <div class="card">
-    <div class="ct">Register in BFS Matrix</div>
-    <div class="cs">Join the network with a valid sponsor address</div>
-    <div class="fb">
-      Registration fee: <strong>0.00001 tBNB</strong><br>
-      100% goes to your BFS matrix upline (the node you are placed under).<br>
-      If placement triggers a cycle, payment overflows to that node's upline automatically.
-    </div>
-    <div class="fg">
-      <label class="fl">Sponsor Address (who invited you)</label>
-      <input type="text" class="fi" id="sponsorIn" placeholder="0x..." disabled>
-      <span class="hint">Must be a registered wallet address</span>
-    </div>
-    <button class="btn bp" id="btnReg" onclick="doRegister()" disabled>Register Now — 0.00001 tBNB</button>
-    <div id="regSt" style="margin-top:.8rem"></div>
-  </div>
+      <div class="card">
+        <div class="ct">Rank Progression</div>
+<div class="tw"><table>
+  <thead><tr><th>Rank</th><th>Matrix Partners Required</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td><span class="rank r0">Distributor</span></td><td>0+</td><td id="rk0">—</td></tr>
+    <tr><td><span class="rank r1">Silver</span></td><td>2+</td><td id="rk1">—</td></tr>
+    <tr><td><span class="rank r2">Gold</span></td><td>6+</td><td id="rk2">—</td></tr>
+    <tr><td><span class="rank r3">Diamond</span></td><td>14+</td><td id="rk3">—</td></tr>
+  </tbody>
+</table></div>
+      </div>
 
-  <div class="card">
-    <div class="ct">Placement Preview</div>
-    <div class="cs">Where you will be placed when you register</div>
-    <div id="ppvEl"><p style="color:var(--muted)">Connect wallet to see your placement preview</p></div>
-  </div>
-
-  <div class="card">
-    <div class="ct">How to Register</div>
-    <ol style="margin-left:1.3rem;color:var(--muted);line-height:2.1;font-size:.86rem">
-      <li>Connect your MetaMask wallet</li>
-      <li>Enter your sponsor's Ethereum address</li>
-      <li>Click "Register Now" and confirm 0.00001 tBNB in MetaMask</li>
-      <li>You are placed in the oldest open BFS slot automatically</li>
-      <li>Your matrix upline receives the 0.00001 tBNB payment</li>
-      <li>You enter the BFS queue — future registrations will fill your slots</li>
-    </ol>
-  </div>
-</div>
-
-<!-- ════════════════ REFERRAL ════════════════ -->
-<div id="referral" class="pane">
-  <div class="card">
-    <div class="ct">Your Referral Address</div>
-    <div class="cs">Share this — people who register with it count as your direct referrals</div>
-    <div class="fg">
-      <label class="fl">Your Wallet Address</label>
-      <div class="rr">
-        <input type="text" class="fi" id="myAddr" readonly>
-        <button class="bg" onclick="copyEl('myAddr')">📋 Copy</button>
+      <div class="card">
+        <div class="ct">How BFS Matrix Works</div>
+        <div style="color:var(--muted);font-size:.86rem;line-height:1.8">
+          <p>📌 <strong style="color:var(--text)">Placement:</strong> New users fill the oldest open slot in the entire
+            tree — guaranteed Breadth-First Search order using the binary heap formula: <code
+              style="color:var(--primary)">parent[i] = allUsers[(i-1)/2]</code>.</p><br>
+          <p>💰 <strong style="color:var(--text)">Fee: 0.00001 tBNB</strong> → 100% to your BFS matrix parent. If your
+            placement triggers a cycle on the parent, payment overflows to their parent automatically.</p><br>
+          <p>🔄 <strong style="color:var(--text)">Auto-Recycle:</strong> When a node fills both slots, it resets and
+            re-enters a priority recycle queue. Future placements go to the recycle queue first, then the main BFS
+            order.</p>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="card">
-    <div class="ct">Your Direct Referrals</div>
-    <div id="refC"><p style="color:var(--muted)">Connect wallet to view</p></div>
-  </div>
-</div>
 
-<!-- ════════════════ NETWORK ════════════════ -->
-<div id="network" class="pane">
-  <div class="card">
-    <div class="ct">Your Referral Network</div>
-    <div class="cs">Users you directly sponsored and their matrix stats</div>
-    <div id="netC"><p style="color:var(--muted)">Connect wallet to view</p></div>
-  </div>
-</div>
+    <!-- ════════════════ MATRIX ════════════════ -->
+    <div id="matrix" class="pane">
+      <!-- Blue card matching screenshot -->
+      <div class="mc" id="matrixCard">
+        <div class="mhdr">
+          <div class="mlvl">Lvl 1</div>
+          <div class="mid" id="mCardId">ID —</div>
+          <div class="mcoins">
+            <div class="ci">⬡</div>
+            <span id="mCoinCnt">0</span>
+          </div>
+        </div>
+        <div class="tw2" id="treeWrap">
+          <p style="color:rgba(255,255,255,.45)">Connect wallet and register to view your matrix</p>
+        </div>
+        <div class="mftr">
+          <div class="mfi">
+            <div class="mfl">👥 Partners</div>
+            <div class="mfv" id="mPart">0</div>
+          </div>
+          <div class="mfi">
+            <div class="mfl">🔄 Cycles</div>
+            <div class="mfv" id="mCyc">0</div>
+          </div>
+          <div class="mfi">
+            <div class="mfl">💎 Total revenue</div>
+            <div class="mfv" id="mRev">0 tBNB</div>
+          </div>
+        </div>
+      </div>
 
-<!-- ════════════════ EXPLORE ════════════════ -->
-<div id="explore" class="pane">
-  <div class="card">
-    <div class="ct">Browse All Users</div>
-    <div class="cs">All registered users in the BFS Matrix</div>
-    <div class="pg">
-      <label style="font-size:.81rem;color:var(--muted)">Page</label>
-      <input type="number" class="fi" id="pageIn" value="0" min="0">
-      <button class="bg" onclick="loadUsers()">Load</button>
+      <!-- Recycle queue -->
+      <div class="card">
+        <div class="ct">Recycle Queue</div>
+        <div class="cs">Nodes that completed a cycle — they have placement priority over new BFS positions</div>
+        <div id="rcqVis">
+          <p style="color:var(--muted)">Connect wallet to view</p>
+        </div>
+      </div>
+
+      <!-- Upline chain -->
+      <div class="card">
+        <div class="ct">Your Matrix Upline Chain</div>
+        <div class="cs">From your BFS parent up to root</div>
+        <div id="uplineC">
+          <p style="color:var(--muted)">—</p>
+        </div>
+      </div>
     </div>
-    <div class="tw">
-      <table>
-        <thead><tr><th>#</th><th>Address</th><th>ID</th><th>Sponsor Refs</th><th>Matrix Partners</th><th>Cycles</th><th>Earned tBNB</th><th>Rank</th></tr></thead>
-        <tbody id="usersB"><tr><td colspan="8" style="text-align:center;color:var(--muted)">Click Load</td></tr></tbody>
-      </table>
+
+    <!-- ════════════════ REGISTER ════════════════ -->
+    <div id="register" class="pane">
+      <div class="card">
+        <div class="ct">Register in BFS Matrix</div>
+        <div class="cs">Join the network with a valid sponsor address</div>
+        <div class="fb">
+          Registration fee: <strong>0.00001 tBNB</strong><br>
+          100% goes to your BFS matrix upline (the node you are placed under).<br>
+          If placement triggers a cycle, payment overflows to that node's upline automatically.
+        </div>
+        <div class="fg">
+          <label class="fl">Sponsor Address (who invited you)</label>
+          <input type="text" class="fi" id="sponsorIn" placeholder="0x..." disabled>
+          <span class="hint">Must be a registered wallet address</span>
+        </div>
+        <button class="btn bp" id="btnReg" onclick="doRegister()" disabled>Register Now — 0.00001 tBNB</button>
+        <div id="regSt" style="margin-top:.8rem"></div>
+      </div>
+
+      <div class="card">
+        <div class="ct">Placement Preview</div>
+        <div class="cs">Where you will be placed when you register</div>
+        <div id="ppvEl">
+          <p style="color:var(--muted)">Connect wallet to see your placement preview</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ct">How to Register</div>
+        <ol style="margin-left:1.3rem;color:var(--muted);line-height:2.1;font-size:.86rem">
+          <li>Connect your MetaMask wallet</li>
+          <li>Enter your sponsor's Ethereum address</li>
+          <li>Click "Register Now" and confirm 0.00001 tBNB in MetaMask</li>
+          <li>You are placed in the oldest open BFS slot automatically</li>
+          <li>Your matrix upline receives the 0.00001 tBNB payment</li>
+          <li>You enter the BFS queue — future registrations will fill your slots</li>
+        </ol>
+      </div>
     </div>
-  </div>
-</div>
-</div><!-- /wrap -->
 
-<script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
-<script>
-/* ═══════════════════════════════════════════════════
-   🔴 UPDATE THESE TWO LINES AFTER DEPLOYING THE CONTRACT
-═══════════════════════════════════════════════════ */
-const CONTRACT_ADDRESS = '0x1C580528215cF619a3Daf62816Ec67E34deD3d03';
-const CHAIN_ID         = 97; // 1=mainnet, 11155111=sepolia, 97=BSC testnet, 31337=hardhat
+    <!-- ════════════════ REFERRAL ════════════════ -->
+    <div id="referral" class="pane">
+      <div class="card">
+        <div class="ct">Your Referral Address</div>
+        <div class="cs">Share this — people who register with it count as your direct referrals</div>
+        <div class="fg">
+          <label class="fl">Your Wallet Address</label>
+          <div class="rr">
+            <input type="text" class="fi" id="myAddr" readonly>
+            <button class="bg" onclick="copyEl('myAddr')">📋 Copy</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="ct">Your Direct Referrals</div>
+        <div id="refC">
+          <p style="color:var(--muted)">Connect wallet to view</p>
+        </div>
+      </div>
+    </div>
 
-/* ═══════════════════════════════════════════════════
-   ABI
-═══════════════════════════════════════════════════ */
-const ABI = [
-  {"inputs":[{"internalType":"address","name":"sponsor","type":"address"}],"name":"register","outputs":[],"stateMutability":"payable","type":"function"},
-  {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"getUser","outputs":[
-    {"internalType":"bool","name":"registered","type":"bool"},
-    {"internalType":"uint32","name":"id","type":"uint32"},
-    {"internalType":"address","name":"sponsor","type":"address"},
-    {"internalType":"address","name":"matrixParent","type":"address"},
-    {"internalType":"address","name":"leftChild","type":"address"},
-    {"internalType":"address","name":"rightChild","type":"address"},
-    {"internalType":"uint8","name":"childCount","type":"uint8"},
-    {"internalType":"uint32","name":"cycleCount","type":"uint32"},
-    {"internalType":"uint32","name":"directCount","type":"uint32"},
-    {"internalType":"uint256","name":"totalReceived","type":"uint256"},
-    {"internalType":"uint32","name":"partnersInMatrix","type":"uint32"},
-    {"internalType":"uint8","name":"rank","type":"uint8"}
-  ],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"address","name":"root_","type":"address"}],"name":"getMatrixTree","outputs":[
-    {"internalType":"address[7]","name":"addrs","type":"address[7]"},
-    {"internalType":"uint32[7]","name":"ids","type":"uint32[7]"},
-    {"internalType":"uint8[7]","name":"childCounts","type":"uint8[7]"},
-    {"internalType":"uint32[7]","name":"cycleCounts","type":"uint32[7]"}
-  ],"stateMutability":"view","type":"function"},
-  {"inputs":[],"name":"getNextPlacementParent","outputs":[
-    {"internalType":"address","name":"parent","type":"address"},
-    {"internalType":"bool","name":"isFromRecycle","type":"bool"},
-    {"internalType":"uint8","name":"slotThatWillBeFilled","type":"uint8"},
-    {"internalType":"uint32","name":"parentCycleCount","type":"uint32"}
-  ],"stateMutability":"view","type":"function"},
-  {"inputs":[],"name":"getRecycleInfo","outputs":[
-    {"internalType":"uint256","name":"head","type":"uint256"},
-    {"internalType":"uint256","name":"length","type":"uint256"},
-    {"internalType":"uint256","name":"pending","type":"uint256"},
-    {"internalType":"address","name":"currentFront","type":"address"}
-  ],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"uint256","name":"from","type":"uint256"},{"internalType":"uint256","name":"count","type":"uint256"}],"name":"getRecycleQueueSlice","outputs":[{"internalType":"address[]","name":"slice","type":"address[]"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"getUplineChain","outputs":[{"internalType":"address[]","name":"chain","type":"address[]"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"address","name":"account","type":"address"},{"internalType":"uint256","name":"limit","type":"uint256"}],"name":"getDirectReferrals","outputs":[{"internalType":"address[]","name":"result","type":"address[]"}],"stateMutability":"view","type":"function"},
-  {"inputs":[],"name":"getAllUsersLength","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"uint256","name":"start","type":"uint256"},{"internalType":"uint256","name":"limit","type":"uint256"}],"name":"getUsers","outputs":[{"internalType":"address[]","name":"result","type":"address[]"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"address","name":"a","type":"address"}],"name":"isRegistered","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},
-  {"inputs":[],"name":"rootAddress","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-  {"inputs":[],"name":"totalUsers","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},
-  {"inputs":[{"internalType":"uint32","name":"id","type":"uint32"}],"name":"getAddressById","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},
-  {"anonymous":false,"inputs":[{"indexed":true,"name":"user","type":"address"},{"indexed":true,"name":"userId","type":"uint32"},{"indexed":true,"name":"sponsor","type":"address"},{"name":"matrixParent","type":"address"},{"name":"slot","type":"uint8"},{"name":"viaRecycle","type":"bool"}],"name":"Registered","type":"event"},
-  {"anonymous":false,"inputs":[{"indexed":true,"name":"node","type":"address"},{"name":"cycleNumber","type":"uint32"},{"name":"recycleQueuePos","type":"uint256"}],"name":"CycleCompleted","type":"event"},
-  {"anonymous":false,"inputs":[{"indexed":true,"name":"recipient","type":"address"},{"indexed":true,"name":"payer","type":"address"},{"name":"amount","type":"uint256"},{"name":"overflowed","type":"bool"}],"name":"PaymentRouted","type":"event"}
-];
+    <!-- ════════════════ NETWORK ════════════════ -->
+    <div id="network" class="pane">
+      <div class="card">
+        <div class="ct">Your Referral Network</div>
+        <div class="cs">Users you directly sponsored and their matrix stats</div>
+        <div id="netC">
+          <p style="color:var(--muted)">Connect wallet to view</p>
+        </div>
+      </div>
+    </div>
 
-const RANK_NAMES=['Distributor','Silver','Gold','Diamond'];
-const RANK_CLS=['r0','r1','r2','r3'];
-const ZERO='0x0000000000000000000000000000000000000000';
-const FEE='10000000000000'; // 0.00001 tBNB
+    <!-- ════════════════ EXPLORE ════════════════ -->
+    <div id="explore" class="pane">
+      <div class="card">
+        <div class="ct">Browse All Users</div>
+        <div class="cs">All registered users in the BFS Matrix</div>
+        <div class="pg">
+          <label style="font-size:.81rem;color:var(--muted)">Page</label>
+          <input type="number" class="fi" id="pageIn" value="0" min="0">
+          <button class="bg" onclick="loadUsers()">Load</button>
+        </div>
+        <div class="tw">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Address</th>
+                <th>ID</th>
+                <th>Sponsor Refs</th>
+                <th>Matrix Partners</th>
+                <th>Cycles</th>
+                <th>Earned tBNB</th>
+                <th>Rank</th>
+              </tr>
+            </thead>
+            <tbody id="usersB">
+              <tr>
+                <td colspan="8" style="text-align:center;color:var(--muted)">Click Load</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div><!-- /wrap -->
 
-let web3,contract,acct=null;
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+  <script>
+    /* ═══════════════════════════════════════════════════
+       🔴 UPDATE THESE TWO LINES AFTER DEPLOYING THE CONTRACT
+    ═══════════════════════════════════════════════════ */
+    const CONTRACT_ADDRESS = '0x3ED789DDdae7FD7010010D6071eEdA00336a824C';
+    const CHAIN_ID = 97; // 1=mainnet, 11155111=sepolia, 97=BSC testnet, 31337=hardhat
 
-/* ═══ TABS ═══ */
-async function go(name,btn){
-  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));
-  document.getElementById(name).classList.add('on');
-  btn.classList.add('on');
-  if(!acct) return;
-  if(name==='matrix')   await renderMatrix();
-  if(name==='referral') await renderReferral();
-  if(name==='network')  await renderNetwork();
-  if(name==='register') await renderPlacementPreview();
-}
+    /* ═══════════════════════════════════════════════════
+       ABI
+    ═══════════════════════════════════════════════════ */
+    const ABI = [
+      {
+        "inputs": [],
+        "name": "AlreadyRegistered",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "CannotSponsorSelf",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "InsufficientFee",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "SponsorNotRegistered",
+        "type": "error"
+      },
+      {
+        "inputs": [],
+        "name": "TransferFailed",
+        "type": "error"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "node",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint32",
+            "name": "cycleNumber",
+            "type": "uint32"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "recycleQueuePos",
+            "type": "uint256"
+          }
+        ],
+        "name": "CycleCompleted",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "uint8",
+            "name": "version",
+            "type": "uint8"
+          }
+        ],
+        "name": "Initialized",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "recipient",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "payer",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "indexed": false,
+            "internalType": "bool",
+            "name": "overflowed",
+            "type": "bool"
+          }
+        ],
+        "name": "PaymentRouted",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint8",
+            "name": "oldRank",
+            "type": "uint8"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint8",
+            "name": "newRank",
+            "type": "uint8"
+          }
+        ],
+        "name": "RankUp",
+        "type": "event"
+      },
+      {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "user",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "uint32",
+            "name": "userId",
+            "type": "uint32"
+          },
+          {
+            "indexed": true,
+            "internalType": "address",
+            "name": "sponsor",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "matrixParent",
+            "type": "address"
+          },
+          {
+            "indexed": false,
+            "internalType": "uint8",
+            "name": "slot",
+            "type": "uint8"
+          },
+          {
+            "indexed": false,
+            "internalType": "bool",
+            "name": "viaRecycle",
+            "type": "bool"
+          }
+        ],
+        "name": "Registered",
+        "type": "event"
+      },
+      {
+        "stateMutability": "payable",
+        "type": "fallback"
+      },
+      {
+        "inputs": [],
+        "name": "MATRIX_WIDTH",
+        "outputs": [
+          {
+            "internalType": "uint8",
+            "name": "",
+            "type": "uint8"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "RANK1_PARTNERS",
+        "outputs": [
+          {
+            "internalType": "uint32",
+            "name": "",
+            "type": "uint32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "RANK2_PARTNERS",
+        "outputs": [
+          {
+            "internalType": "uint32",
+            "name": "",
+            "type": "uint32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "RANK3_PARTNERS",
+        "outputs": [
+          {
+            "internalType": "uint32",
+            "name": "",
+            "type": "uint32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "REGISTRATION_FEE",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "name": "allUsers",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint32",
+            "name": "id",
+            "type": "uint32"
+          }
+        ],
+        "name": "getAddressById",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getAllUsersLength",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "limit",
+            "type": "uint256"
+          }
+        ],
+        "name": "getDirectReferrals",
+        "outputs": [
+          {
+            "internalType": "address[]",
+            "name": "result",
+            "type": "address[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "root_",
+            "type": "address"
+          }
+        ],
+        "name": "getMatrixTree",
+        "outputs": [
+          {
+            "internalType": "address[15]",
+            "name": "addrs",
+            "type": "address[15]"
+          },
+          {
+            "internalType": "uint32[15]",
+            "name": "ids",
+            "type": "uint32[15]"
+          },
+          {
+            "internalType": "uint8[15]",
+            "name": "childCounts",
+            "type": "uint8[15]"
+          },
+          {
+            "internalType": "uint32[15]",
+            "name": "cycleCounts",
+            "type": "uint32[15]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getNextPlacementParent",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "parent",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "isFromRecycle",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint8",
+            "name": "slotThatWillBeFilled",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint32",
+            "name": "parentCycleCount",
+            "type": "uint32"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "getRecycleInfo",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "head",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "length",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "pending",
+            "type": "uint256"
+          },
+          {
+            "internalType": "address",
+            "name": "currentFront",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "from",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "count",
+            "type": "uint256"
+          }
+        ],
+        "name": "getRecycleQueueSlice",
+        "outputs": [
+          {
+            "internalType": "address[]",
+            "name": "slice",
+            "type": "address[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
+        ],
+        "name": "getUplineChain",
+        "outputs": [
+          {
+            "internalType": "address[]",
+            "name": "chain",
+            "type": "address[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "account",
+            "type": "address"
+          }
+        ],
+        "name": "getUser",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "registered",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint32",
+            "name": "id",
+            "type": "uint32"
+          },
+          {
+            "internalType": "address",
+            "name": "sponsor",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "matrixParent",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "leftChild",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "rightChild",
+            "type": "address"
+          },
+          {
+            "internalType": "uint8",
+            "name": "childCount",
+            "type": "uint8"
+          },
+          {
+            "internalType": "uint32",
+            "name": "cycleCount",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint32",
+            "name": "directCount",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint256",
+            "name": "totalReceived",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint32",
+            "name": "partnersInMatrix",
+            "type": "uint32"
+          },
+          {
+            "internalType": "uint8",
+            "name": "rank",
+            "type": "uint8"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "uint256",
+            "name": "start",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "limit",
+            "type": "uint256"
+          }
+        ],
+        "name": "getUsers",
+        "outputs": [
+          {
+            "internalType": "address[]",
+            "name": "result",
+            "type": "address[]"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "initialize",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "a",
+            "type": "address"
+          }
+        ],
+        "name": "isRegistered",
+        "outputs": [
+          {
+            "internalType": "bool",
+            "name": "",
+            "type": "bool"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [
+          {
+            "internalType": "address",
+            "name": "sponsor",
+            "type": "address"
+          }
+        ],
+        "name": "register",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "rescueETH",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "rootAddress",
+        "outputs": [
+          {
+            "internalType": "address",
+            "name": "",
+            "type": "address"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "inputs": [],
+        "name": "totalUsers",
+        "outputs": [
+          {
+            "internalType": "uint256",
+            "name": "",
+            "type": "uint256"
+          }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+      },
+      {
+        "stateMutability": "payable",
+        "type": "receive"
+      }
+    ];
 
-/* ═══ WEB3 ═══ */
-async function init(){
-  if(typeof window.ethereum==='undefined'){alert('Install MetaMask!');return false}
-  web3=new Web3(window.ethereum);
-  contract=new web3.eth.Contract(ABI,CONTRACT_ADDRESS);
-  return true;
-}
+    const RANK_NAMES = ['Distributor', 'Silver', 'Gold', 'Diamond'];
+    const RANK_CLS = ['r0', 'r1', 'r2', 'r3'];
+    const ZERO = '0x0000000000000000000000000000000000000000';
+    const FEE = '10000000000000'; // 0.00001 tBNB
 
-async function connectWallet(){
-  if(!await init()) return;
-  try{
-    const a=await window.ethereum.request({method:'eth_requestAccounts'});
-    acct=a[0];
-    afterConnect();
-    await refreshAll();
-    toast('Wallet connected!','s');
-  }catch(e){toast('Failed: '+e.message,'e')}
-}
+    let web3, contract, acct = null;
 
-function afterConnect(){
-  document.getElementById('btnCon').style.display='none';
-  document.getElementById('btnDis').style.display='block';
-  const wp=document.getElementById('wPill');
-  wp.style.display='block'; wp.textContent=short(acct);
-  document.getElementById('myAddr').value=acct;
-  document.getElementById('sponsorIn').disabled=false;
-  document.getElementById('btnReg').disabled=false;
-}
+    /* ═══ TABS ═══ */
+    async function go(name, btn) {
+      document.querySelectorAll('.pane').forEach(p => p.classList.remove('on'));
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+      document.getElementById(name).classList.add('on');
+      btn.classList.add('on');
+      if (!acct) return;
+      if (name === 'matrix') await renderMatrix();
+      if (name === 'referral') await renderReferral();
+      if (name === 'network') await renderNetwork();
+      if (name === 'register') await renderPlacementPreview();
+    }
 
-function disconnectWallet(){
-  acct=null;
-  document.getElementById('btnCon').style.display='block';
-  document.getElementById('btnDis').style.display='none';
-  document.getElementById('wPill').style.display='none';
-  document.getElementById('sponsorIn').disabled=true;
-  document.getElementById('btnReg').disabled=true;
-  toast('Disconnected','i');
-}
+    /* ═══ WEB3 ═══ */
+    async function init() {
+      if (typeof window.ethereum === 'undefined') { alert('Install MetaMask!'); return false }
+      web3 = new Web3(window.ethereum);
+      contract = new web3.eth.Contract(ABI, CONTRACT_ADDRESS);
+      return true;
+    }
 
-async function refreshAll(){
-  await renderDashboard();
-  await loadTotalUsers();
-  if(document.getElementById('matrix').classList.contains('on')) await renderMatrix();
-}
+    async function connectWallet() {
+      if (!await init()) return;
+      try {
+        const a = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        acct = a[0];
+        afterConnect();
+        await refreshAll();
+        toast('Wallet connected!', 's');
+      } catch (e) { toast('Failed: ' + e.message, 'e') }
+    }
 
-/* ═══ DASHBOARD ═══ */
-async function renderDashboard(){
-  if(!acct) return;
-  try{
-    const u=await contract.methods.getUser(acct).call();
-    const rank=+u.rank;
-    document.getElementById('dSt').textContent=u.registered?'Active':'Not Reg.';
-    document.getElementById('dStN').textContent=u.registered?'✓ member':'register now';
-    document.getElementById('dId').textContent=u.registered?'#'+u.id:'—';
-    document.getElementById('dRk').textContent=u.registered?RANK_NAMES[rank]:'—';
-    document.getElementById('dRkN').innerHTML=u.registered?`<span class="rank ${RANK_CLS[rank]}">${RANK_NAMES[rank]}</span>`:'';
-    document.getElementById('dDr').textContent=u.directCount;
-    document.getElementById('dCy').textContent=u.cycleCount;
-    document.getElementById('dEa').textContent=parseFloat(web3.utils.fromWei(u.totalReceived,'ether')).toFixed(5);
-    document.getElementById('dPa').textContent=u.partnersInMatrix;
-    if(u.registered) rankBars(+u.directCount);
-    // Profile
-    const par=u.matrixParent===ZERO?'Root (none)':short(u.matrixParent);
-    document.getElementById('profC').innerHTML=`
+    function afterConnect() {
+      document.getElementById('btnCon').style.display = 'none';
+      document.getElementById('btnDis').style.display = 'block';
+      const wp = document.getElementById('wPill');
+      wp.style.display = 'block'; wp.textContent = short(acct);
+      document.getElementById('myAddr').value = acct;
+      document.getElementById('sponsorIn').disabled = false;
+      document.getElementById('btnReg').disabled = false;
+    }
+
+    function disconnectWallet() {
+      acct = null;
+      document.getElementById('btnCon').style.display = 'block';
+      document.getElementById('btnDis').style.display = 'none';
+      document.getElementById('wPill').style.display = 'none';
+      document.getElementById('sponsorIn').disabled = true;
+      document.getElementById('btnReg').disabled = true;
+      toast('Disconnected', 'i');
+    }
+
+    async function refreshAll() {
+      await renderDashboard();
+      await loadTotalUsers();
+      if (document.getElementById('matrix').classList.contains('on')) await renderMatrix();
+    }
+
+    /* ═══ DASHBOARD ═══ */
+    async function renderDashboard() {
+      if (!acct) return;
+      try {
+        const u = await contract.methods.getUser(acct).call();
+        const rank = +u.rank;
+        document.getElementById('dSt').textContent = u.registered ? 'Active' : 'Not Reg.';
+        document.getElementById('dStN').textContent = u.registered ? '✓ member' : 'register now';
+        document.getElementById('dId').textContent = u.registered ? '#' + u.id : '—';
+        document.getElementById('dRk').textContent = u.registered ? RANK_NAMES[rank] : '—';
+        document.getElementById('dRkN').innerHTML = u.registered ? `<span class="rank ${RANK_CLS[rank]}">${RANK_NAMES[rank]}</span>` : '';
+        document.getElementById('dDr').textContent = u.directCount;
+        document.getElementById('dCy').textContent = u.cycleCount;
+        document.getElementById('dEa').textContent = parseFloat(web3.utils.fromWei(u.totalReceived, 'ether')).toFixed(5);
+        document.getElementById('dPa').textContent = u.partnersInMatrix;
+        if (u.registered) rankBars(+u.partnersInMatrix);
+        // Profile
+        const par = u.matrixParent === ZERO ? 'Root (none)' : short(u.matrixParent);
+        document.getElementById('profC').innerHTML = `
       <table style="width:100%;font-size:.84rem">
-        ${r2('Wallet',`<span class="mono">${acct}</span>`)}
-        ${r2('User ID',u.registered?'#'+u.id:'Not registered')}
-        ${r2('Registered',u.registered?'<span style="color:var(--green)"><span class="dot dg"></span>Yes</span>':'<span style="color:var(--red)"><span class="dot dr"></span>No</span>')}
-        ${r2('Rank',`<span class="rank ${RANK_CLS[rank]}">${RANK_NAMES[rank]}</span>`)}
-        ${r2('Sponsor',`<span class="mono">${short(u.sponsor)}</span>`)}
-        ${r2('Matrix Parent',`<span class="mono">${par}</span>`)}
-        ${r2('Left Child',u.leftChild===ZERO?'<span style="color:var(--muted)">empty</span>':`<span class="mono">${short(u.leftChild)}</span>`)}
-        ${r2('Right Child',u.rightChild===ZERO?'<span style="color:var(--muted)">empty</span>':`<span class="mono">${short(u.rightChild)}</span>`)}
-        ${r2('Slots Filled',u.childCount+' / 2')}
-        ${r2('Cycles Completed',u.cycleCount)}
-        ${r2('Direct Referrals',u.directCount)}
-        ${r2('Matrix Partners (all downline)',u.partnersInMatrix)}
-        ${r2('Total Received',web3.utils.fromWei(u.totalReceived,'ether')+' tBNB')}
+        ${r2('Wallet', `<span class="mono">${acct}</span>`)}
+        ${r2('User ID', u.registered ? '#' + u.id : 'Not registered')}
+        ${r2('Registered', u.registered ? '<span style="color:var(--green)"><span class="dot dg"></span>Yes</span>' : '<span style="color:var(--red)"><span class="dot dr"></span>No</span>')}
+        ${r2('Rank', `<span class="rank ${RANK_CLS[rank]}">${RANK_NAMES[rank]}</span>`)}
+        ${r2('Sponsor', `<span class="mono">${short(u.sponsor)}</span>`)}
+        ${r2('Matrix Parent', `<span class="mono">${par}</span>`)}
+        ${r2('Left Child', u.leftChild === ZERO ? '<span style="color:var(--muted)">empty</span>' : `<span class="mono">${short(u.leftChild)}</span>`)}
+        ${r2('Right Child', u.rightChild === ZERO ? '<span style="color:var(--muted)">empty</span>' : `<span class="mono">${short(u.rightChild)}</span>`)}
+        ${r2('Slots Filled', u.childCount + ' / 2')}
+        ${r2('Cycles Completed', u.cycleCount)}
+        ${r2('Direct Referrals', u.directCount)}
+        ${r2('Matrix Partners (all downline)', u.partnersInMatrix)}
+        ${r2('Total Received', web3.utils.fromWei(u.totalReceived, 'ether') + ' tBNB')}
       </table>`;
-  }catch(e){console.error('dash',e)}
-}
+      } catch (e) { console.error('dash', e) }
+    }
 
-function rankBars(refs){
-  [0,2,4,6].forEach((t,i)=>{
+function rankBars(partners){
+  [0,2,6,14].forEach((t,i)=>{
     const el=document.getElementById('rk'+i);
     if(!el) return;
-    if(refs>=t){el.innerHTML='<span style="color:var(--green)">✓ Achieved</span>';}
-    else{el.textContent=(t-refs)+' more needed';el.style.color='var(--muted)';}
+    if(partners>=t){el.innerHTML='<span style="color:var(--green)">✓ Achieved</span>';}
+    else{el.textContent=(t-partners)+' more needed';el.style.color='var(--muted)';}
   });
 }
 
-async function loadTotalUsers(){
-  try{document.getElementById('dTu').textContent=await contract.methods.getAllUsersLength().call();}catch(e){}
-}
-
-/* ═══ MATRIX TREE ═══ */
-async function renderMatrix(){
-  if(!acct) return;
-  const wrap=document.getElementById('treeWrap');
-  wrap.innerHTML='<p style="color:rgba(255,255,255,.45)"><span class="sp"></span> Loading…</p>';
-  try{
-    const u=await contract.methods.getUser(acct).call();
-    if(!u.registered){
-      wrap.innerHTML='<p style="color:rgba(255,255,255,.4)">Register first to view your matrix</p>';
-      return;
+    async function loadTotalUsers() {
+      try { document.getElementById('dTu').textContent = await contract.methods.getAllUsersLength().call(); } catch (e) { }
     }
-    document.getElementById('mCardId').textContent='ID '+u.id;
-    document.getElementById('mPart').textContent=u.partnersInMatrix;
-    document.getElementById('mCyc').textContent=u.cycleCount;
-    document.getElementById('mRev').textContent=parseFloat(web3.utils.fromWei(u.totalReceived,'ether')).toFixed(5)+' tBNB';
 
-    const mv=await contract.methods.getMatrixTree(acct).call();
-    const {addrs,ids,childCounts,cycleCounts}=mv;
+    /* ═══ MATRIX TREE ═══ */
+    async function renderMatrix() {
+      if (!acct) return;
+      const wrap = document.getElementById('treeWrap');
+      wrap.innerHTML = '<p style="color:rgba(255,255,255,.45)"><span class="sp"></span> Loading…</p>';
+      try {
+        const u = await contract.methods.getUser(acct).call();
+        if (!u.registered) {
+          wrap.innerHTML = '<p style="color:rgba(255,255,255,.4)">Register first to view your matrix</p>';
+          return;
+        }
+        document.getElementById('mCardId').textContent = 'ID ' + u.id;
+        document.getElementById('mPart').textContent = u.partnersInMatrix;
+        document.getElementById('mCyc').textContent = u.cycleCount;
+        document.getElementById('mRev').textContent = parseFloat(web3.utils.fromWei(u.totalReceived, 'ether')).toFixed(5) + ' tBNB';
 
-    // Coin count = filled nodes in tree (positions 1-6)
-    let filled=0;
-    for(let i=1;i<7;i++) if(addrs[i]!==ZERO&&ids[i]!=='0') filled++;
-    document.getElementById('mCoinCnt').textContent=filled;
+        const mv = await contract.methods.getMatrixTree(acct).call();
+        const { addrs, ids, childCounts, cycleCounts } = mv;
 
-    // next placement parent for highlighting
-    let nextParent=ZERO;
-    try{const np=await contract.methods.getNextPlacementParent().call();nextParent=np.parent;}catch(e){}
+        // Coin count = filled nodes in tree (positions 1-6)
+        let filled = 0;
+        for (let i = 1; i < 15; i++) if (addrs[i] !== ZERO && ids[i] !== '0') filled++;
+        document.getElementById('mCoinCnt').textContent = filled;
 
-    const mkNode=(idx)=>{
-      const addr=addrs[idx],id=ids[idx];
-      const empty=!addr||addr===ZERO||id==='0'||id==='0';
-      const isSelf=addr&&addr.toLowerCase()===acct.toLowerCase();
-      const isNext=addr&&addr.toLowerCase()===nextParent.toLowerCase()&&!empty;
-      const cycled=!empty&&+cycleCounts[idx]>0;
+        // next placement parent for highlighting
+        let nextParent = ZERO;
+        try { const np = await contract.methods.getNextPlacementParent().call(); nextParent = np.parent; } catch (e) { }
 
-      let cls,lbl,tip;
-      if(empty){
-        cls='n-e';lbl='&nbsp;';tip='Empty slot';
-      } else if(isSelf){
-        cls='n-s';lbl=id;tip=`You — #${id} | slots:${childCounts[idx]}/2 | cycles:${cycleCounts[idx]}`;
-      } else if(isNext){
-        cls='n-a';lbl=id;tip=`Next receiver — #${id} | ${short(addr)} | slots:${childCounts[idx]}/2`;
-      } else if(cycled){
-        cls='n-r';lbl=id;tip=`#${id} | ${short(addr)} | cycles:${cycleCounts[idx]} | slots:${childCounts[idx]}/2`;
-      } else {
-        cls='n-f';lbl=id;tip=`#${id} | ${short(addr)} | slots:${childCounts[idx]}/2`;
-      }
-      const slbl=empty?'empty':`#${id}`;
-      return `<div class="nd" onclick="nodeClick('${addr||''}','${id||''}')" title="">
+        const mkNode = (idx) => {
+          const addr = addrs[idx], id = ids[idx];
+          const empty = !addr || addr === ZERO || id === '0' || id === '0';
+          const isSelf = addr && addr.toLowerCase() === acct.toLowerCase();
+          const isNext = addr && addr.toLowerCase() === nextParent.toLowerCase() && !empty;
+          const cycled = !empty && +cycleCounts[idx] > 0;
+
+          let cls, lbl, tip;
+          if (empty) {
+            cls = 'n-e'; lbl = '&nbsp;'; tip = 'Empty slot';
+          } else if (isSelf) {
+            cls = 'n-s'; lbl = id; tip = `You — #${id} | slots:${childCounts[idx]}/2 | cycles:${cycleCounts[idx]}`;
+          } else if (isNext) {
+            cls = 'n-a'; lbl = id; tip = `Next receiver — #${id} | ${short(addr)} | slots:${childCounts[idx]}/2`;
+          } else if (cycled) {
+            cls = 'n-r'; lbl = id; tip = `#${id} | ${short(addr)} | cycles:${cycleCounts[idx]} | slots:${childCounts[idx]}/2`;
+          } else {
+            cls = 'n-f'; lbl = id; tip = `#${id} | ${short(addr)} | slots:${childCounts[idx]}/2`;
+          }
+          const slbl = empty ? 'empty' : `#${id}`;
+          return `<div class="nd" onclick="nodeClick('${addr || ''}','${id || ''}')" title="">
         <div class="nc ${cls}">
           ${lbl}
           <div class="tip">${tip}</div>
         </div>
         <div class="nlbl">${slbl}</div>
       </div>`;
-    };
+        };
 
-    // Draw 3 rows (row0=you, row1=2children, row2=4grandchildren)
-    // with connector lines between them
-    wrap.innerHTML=`
-      <div class="tr" id="row0">${mkNode(0)}</div>
-      <div class="ts"><svg class="tsv" id="svg01" height="24"></svg></div>
-      <div class="tr" id="row1">${mkNode(1)}${mkNode(2)}</div>
-      <div class="ts"><svg class="tsv" id="svg12" height="24"></svg></div>
-      <div class="tr" id="row2">${mkNode(3)}${mkNode(4)}${mkNode(5)}${mkNode(6)}</div>
-    `;
+        // Draw 3 rows (row0=you, row1=2children, row2=4grandchildren)
+        // with connector lines between them
+        wrap.innerHTML = `
+  <div class="tr" id="row0">${mkNode(0)}</div>
+  <div class="ts"><svg class="tsv" id="svg01" height="24"></svg></div>
+  <div class="tr" id="row1">${mkNode(1)}${mkNode(2)}</div>
+  <div class="ts"><svg class="tsv" id="svg12" height="24"></svg></div>
+  <div class="tr" id="row2">${mkNode(3)}${mkNode(4)}${mkNode(5)}${mkNode(6)}</div>
+  <div class="ts"><svg class="tsv" id="svg23" height="24"></svg></div>
+  <div class="tr" id="row3">${mkNode(7)}${mkNode(8)}${mkNode(9)}${mkNode(10)}${mkNode(11)}${mkNode(12)}${mkNode(13)}${mkNode(14)}</div>
+`;
 
-    // Draw connector lines after DOM renders
-    requestAnimationFrame(()=>drawConnectors(addrs,ids));
+        // Draw connector lines after DOM renders
+        requestAnimationFrame(() => drawConnectors(addrs, ids));
 
-    // Recycle queue
-    await renderRecycleQueue();
-    // Upline
-    await renderUpline();
+        // Recycle queue
+        await renderRecycleQueue();
+        // Upline
+        await renderUpline();
 
-  }catch(e){
-    wrap.innerHTML='<p style="color:var(--red)">Error: '+e.message+'</p>';
-    console.error('matrix',e);
-  }
-}
-
-function drawConnectors(addrs,ids){
-  // Row 0 → Row 1
-  try{
-    const r0=document.getElementById('row0');
-    const r1=document.getElementById('row1');
-    const svg01=document.getElementById('svg01');
-    if(!r0||!r1||!svg01) return;
-
-    const wrap=svg01.closest('.tw2');
-    const wRect=wrap.getBoundingClientRect();
-    const row0Nodes=r0.querySelectorAll('.nd');
-    const row1Nodes=r1.querySelectorAll('.nd');
-    if(!row0Nodes.length||!row1Nodes.length) return;
-
-    const getCenter=(el)=>{
-      const r=el.getBoundingClientRect();
-      return{x:r.left+r.width/2-wRect.left,y:r.top+r.height/2-wRect.top};
-    };
-
-    let lines='';
-    const root0=getCenter(row0Nodes[0]);
-    const y0=root0.y+30; // bottom of root node circle approx
-    const svg01Rect=svg01.getBoundingClientRect();
-    const svgOffY=svg01Rect.top-wRect.top;
-
-    row1Nodes.forEach(n=>{
-      const c=getCenter(n);
-      const cx=c.x;
-      const y_top=y0-svgOffY;
-      const y_bot=c.y-svgOffY-26;
-      lines+=`<line x1="${root0.x}" y1="${Math.max(0,y_top)}" x2="${cx}" y2="${Math.max(0,y_bot)}" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
-    });
-    svg01.innerHTML=lines;
-
-    // Row 1 → Row 2
-    const svg12=document.getElementById('svg12');
-    const row2Nodes=document.getElementById('row2').querySelectorAll('.nd');
-    if(!svg12||!row2Nodes.length) return;
-    const svg12Rect=svg12.getBoundingClientRect();
-    const svgOff12Y=svg12Rect.top-wRect.top;
-    let lines2='';
-    [[0,0],[0,1],[1,2],[1,3]].forEach(([p,c])=>{
-      if(row1Nodes[p]&&row2Nodes[c]){
-        const pc=getCenter(row1Nodes[p]);
-        const cc=getCenter(row2Nodes[c]);
-        const y1=pc.y+26-svgOff12Y;
-        const y2=cc.y-26-svgOff12Y;
-        lines2+=`<line x1="${pc.x}" y1="${Math.max(0,y1)}" x2="${cc.x}" y2="${Math.max(0,y2)}" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+      } catch (e) {
+        wrap.innerHTML = '<p style="color:var(--red)">Error: ' + e.message + '</p>';
+        console.error('matrix', e);
       }
-    });
-    svg12.innerHTML=lines2;
-  }catch(e){}
-}
-
-function nodeClick(addr,id){
-  if(!addr||addr===ZERO) return;
-  navigator.clipboard.writeText(addr).then(()=>toast('Copied #'+id+': '+short(addr),'i'));
-}
-
-/* ═══ RECYCLE QUEUE ═══ */
-async function renderRecycleQueue(){
-  const el=document.getElementById('rcqVis');
-  try{
-    const ri=await contract.methods.getRecycleInfo().call();
-    const head=+ri.head,len=+ri.length,pending=+ri.pending;
-    const front=ri.currentFront;
-
-    if(len===0){
-      el.innerHTML=`<p style="color:var(--muted);font-size:.84rem">No recycled nodes yet. First cycle will appear here.</p>`;
-      return;
     }
 
-    let html=`<div style="margin-bottom:.6rem;font-size:.81rem;color:var(--muted)">
+    function drawConnectors(addrs, ids) {
+      // Row 0 → Row 1
+      try {
+        const r0 = document.getElementById('row0');
+        const r1 = document.getElementById('row1');
+        const svg01 = document.getElementById('svg01');
+        if (!r0 || !r1 || !svg01) return;
+
+        const wrap = svg01.closest('.tw2');
+        const wRect = wrap.getBoundingClientRect();
+        const row0Nodes = r0.querySelectorAll('.nd');
+        const row1Nodes = r1.querySelectorAll('.nd');
+        if (!row0Nodes.length || !row1Nodes.length) return;
+
+        const getCenter = (el) => {
+          const r = el.getBoundingClientRect();
+          return { x: r.left + r.width / 2 - wRect.left, y: r.top + r.height / 2 - wRect.top };
+        };
+
+        let lines = '';
+        const root0 = getCenter(row0Nodes[0]);
+        const y0 = root0.y + 30;
+        const svg01Rect = svg01.getBoundingClientRect();
+        const svgOffY = svg01Rect.top - wRect.top;
+
+        row1Nodes.forEach(n => {
+          const c = getCenter(n);
+          const cx = c.x;
+          const y_top = y0 - svgOffY;
+          const y_bot = c.y - svgOffY - 26;
+          lines += `<line x1="${root0.x}" y1="${Math.max(0, y_top)}" x2="${cx}" y2="${Math.max(0, y_bot)}" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+        });
+        svg01.innerHTML = lines;
+
+        // Row 1 → Row 2
+        const svg12 = document.getElementById('svg12');
+        const row2Nodes = document.getElementById('row2').querySelectorAll('.nd');
+        if (!svg12 || !row2Nodes.length) return;
+        const svg12Rect = svg12.getBoundingClientRect();
+        const svgOff12Y = svg12Rect.top - wRect.top;
+        let lines2 = '';
+        [[0, 0], [0, 1], [1, 2], [1, 3]].forEach(([p, c]) => {
+          if (row1Nodes[p] && row2Nodes[c]) {
+            const pc = getCenter(row1Nodes[p]);
+            const cc = getCenter(row2Nodes[c]);
+            const y1 = pc.y + 26 - svgOff12Y;
+            const y2 = cc.y - 26 - svgOff12Y;
+            lines2 += `<line x1="${pc.x}" y1="${Math.max(0, y1)}" x2="${cc.x}" y2="${Math.max(0, y2)}" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+          }
+        });
+        svg12.innerHTML = lines2;
+
+        // Row 2 → Row 3
+        const svg23 = document.getElementById('svg23');
+        const row3Nodes = document.getElementById('row3').querySelectorAll('.nd');
+        if (!svg23 || !row3Nodes.length) return;
+        const svg23Rect = svg23.getBoundingClientRect();
+        const svgOff23Y = svg23Rect.top - wRect.top;
+        let lines3 = '';
+        [[0, 0], [0, 1], [1, 2], [1, 3], [2, 4], [2, 5], [3, 6], [3, 7]].forEach(([p, c]) => {
+          if (row2Nodes[p] && row3Nodes[c]) {
+            const pc = getCenter(row2Nodes[p]);
+            const cc = getCenter(row3Nodes[c]);
+            const y1 = pc.y + 26 - svgOff23Y;
+            const y2 = cc.y - 26 - svgOff23Y;
+            lines3 += `<line x1="${pc.x}" y1="${Math.max(0, y1)}" x2="${cc.x}" y2="${Math.max(0, y2)}" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+          }
+        });
+        svg23.innerHTML = lines3;
+      } catch (e) { }
+    }
+
+    function nodeClick(addr, id) {
+      if (!addr || addr === ZERO) return;
+      navigator.clipboard.writeText(addr).then(() => toast('Copied #' + id + ': ' + short(addr), 'i'));
+    }
+
+    /* ═══ RECYCLE QUEUE ═══ */
+    async function renderRecycleQueue() {
+      const el = document.getElementById('rcqVis');
+      try {
+        const ri = await contract.methods.getRecycleInfo().call();
+        const head = +ri.head, len = +ri.length, pending = +ri.pending;
+        const front = ri.currentFront;
+
+        if (len === 0) {
+          el.innerHTML = `<p style="color:var(--muted);font-size:.84rem">No recycled nodes yet. First cycle will appear here.</p>`;
+          return;
+        }
+
+        let html = `<div style="margin-bottom:.6rem;font-size:.81rem;color:var(--muted)">
       Total entries: <strong style="color:var(--text)">${len}</strong> &nbsp;|&nbsp;
       Used: <strong style="color:var(--text)">${head}</strong> &nbsp;|&nbsp;
-      Pending: <strong style="color:${pending>0?'var(--green)':'var(--muted)'}">${pending}</strong> &nbsp;|&nbsp;
-      Next: <strong style="color:var(--accent)">${front===ZERO?'none':short(front)}</strong>
+      Pending: <strong style="color:${pending > 0 ? 'var(--green)' : 'var(--muted)'}">${pending}</strong> &nbsp;|&nbsp;
+      Next: <strong style="color:var(--accent)">${front === ZERO ? 'none' : short(front)}</strong>
     </div><div class="rqs">`;
 
-    // show from max(0, head-1) to head+6
-    const from=Math.max(0,head-1);
-    const cnt=Math.min(8,len-from);
-    let slice=[];
-    if(cnt>0) slice=await contract.methods.getRecycleQueueSlice(from,cnt).call();
+        // show from max(0, head-1) to head+6
+        const from = Math.max(0, head - 1);
+        const cnt = Math.min(8, len - from);
+        let slice = [];
+        if (cnt > 0) slice = await contract.methods.getRecycleQueueSlice(from, cnt).call();
 
-    if(from>0) html+=`<div class="rqm">…${from} used</div><div class="rqa">→</div>`;
-    slice.forEach((addr,i)=>{
-      const qi=from+i;
-      const isH=qi===head;
-      const isUsed=qi<head;
-      let cls=isH?'rq-head':isUsed?'rq-used':'rq-reg';
-      let lbl=isH?'▶ next':short(addr);
-      html+=`<div class="rqn ${cls}" title="queue[${qi}]=${addr}">${lbl}</div>`;
-      if(i<slice.length-1) html+='<div class="rqa">→</div>';
-    });
-    if(from+cnt<len) html+=`<div class="rqa">→</div><div class="rqm">${len-from-cnt} more…</div>`;
-    html+='</div>';
-    el.innerHTML=html;
-  }catch(e){el.innerHTML='<p style="color:var(--muted)">'+e.message+'</p>';}
-}
+        if (from > 0) html += `<div class="rqm">…${from} used</div><div class="rqa">→</div>`;
+        slice.forEach((addr, i) => {
+          const qi = from + i;
+          const isH = qi === head;
+          const isUsed = qi < head;
+          let cls = isH ? 'rq-head' : isUsed ? 'rq-used' : 'rq-reg';
+          let lbl = isH ? '▶ next' : short(addr);
+          html += `<div class="rqn ${cls}" title="queue[${qi}]=${addr}">${lbl}</div>`;
+          if (i < slice.length - 1) html += '<div class="rqa">→</div>';
+        });
+        if (from + cnt < len) html += `<div class="rqa">→</div><div class="rqm">${len - from - cnt} more…</div>`;
+        html += '</div>';
+        el.innerHTML = html;
+      } catch (e) { el.innerHTML = '<p style="color:var(--muted)">' + e.message + '</p>'; }
+    }
 
-/* ═══ UPLINE CHAIN ═══ */
-async function renderUpline(){
-  const el=document.getElementById('uplineC');
-  try{
-    const chain=await contract.methods.getUplineChain(acct).call();
-    if(!chain.length){el.innerHTML='<p style="color:var(--muted)">Root node — no matrix upline</p>';return;}
-    let html='<div class="uc">';
-    html+=`<span class="mono" style="color:var(--primary)">${short(acct)} (you)</span>`;
-    chain.forEach(addr=>{
-      html+=`<span style="color:var(--muted)">→</span><span class="mono" style="color:var(--text)">${short(addr)}</span>`;
-    });
-    html+='<span style="color:var(--muted)">→ root</span></div>';
-    el.innerHTML=html;
-  }catch(e){el.innerHTML='<p style="color:var(--muted)">—</p>';}
-}
+    /* ═══ UPLINE CHAIN ═══ */
+    async function renderUpline() {
+      const el = document.getElementById('uplineC');
+      try {
+        const chain = await contract.methods.getUplineChain(acct).call();
+        if (!chain.length) { el.innerHTML = '<p style="color:var(--muted)">Root node — no matrix upline</p>'; return; }
+        let html = '<div class="uc">';
+        html += `<span class="mono" style="color:var(--primary)">${short(acct)} (you)</span>`;
+        chain.forEach(addr => {
+          html += `<span style="color:var(--muted)">→</span><span class="mono" style="color:var(--text)">${short(addr)}</span>`;
+        });
+        html += '<span style="color:var(--muted)">→ root</span></div>';
+        el.innerHTML = html;
+      } catch (e) { el.innerHTML = '<p style="color:var(--muted)">—</p>'; }
+    }
 
-/* ═══ PLACEMENT PREVIEW ═══ */
-async function renderPlacementPreview(){
-  const el=document.getElementById('ppvEl');
-  if(!acct){el.innerHTML='<p style="color:var(--muted)">Connect wallet</p>';return;}
-  try{
-    const isReg=await contract.methods.isRegistered(acct).call();
-    if(isReg){el.innerHTML='<p style="color:var(--green)">✓ You are already registered!</p>';return;}
-    const np=await contract.methods.getNextPlacementParent().call();
-    const {parent,isFromRecycle,slotThatWillBeFilled,parentCycleCount}=np;
-    if(!parent||parent===ZERO){el.innerHTML='<p style="color:var(--muted)">Cannot determine</p>';return;}
-    let pu={id:'?',childCount:0,cycleCount:0,matrixParent:ZERO};
-    try{pu=await contract.methods.getUser(parent).call();}catch(e){}
-    const willCycle=+pu.childCount===1; // this placement would fill slot[1] → cycle!
-    el.innerHTML=`<div class="ppv">
+    /* ═══ PLACEMENT PREVIEW ═══ */
+    async function renderPlacementPreview() {
+      const el = document.getElementById('ppvEl');
+      if (!acct) { el.innerHTML = '<p style="color:var(--muted)">Connect wallet</p>'; return; }
+      try {
+        const isReg = await contract.methods.isRegistered(acct).call();
+        if (isReg) { el.innerHTML = '<p style="color:var(--green)">✓ You are already registered!</p>'; return; }
+        const np = await contract.methods.getNextPlacementParent().call();
+        const { parent, isFromRecycle, slotThatWillBeFilled, parentCycleCount } = np;
+        if (!parent || parent === ZERO) { el.innerHTML = '<p style="color:var(--muted)">Cannot determine</p>'; return; }
+        let pu = { id: '?', childCount: 0, cycleCount: 0, matrixParent: ZERO };
+        try { pu = await contract.methods.getUser(parent).call(); } catch (e) { }
+        const willCycle = +pu.childCount === 1; // this placement would fill slot[1] → cycle!
+        el.innerHTML = `<div class="ppv">
       <p style="margin-bottom:.65rem;font-weight:600">When you register, you will be placed under:</p>
       <table style="width:100%;font-size:.83rem">
-        ${r2('Matrix Parent',`<span class="mono">${parent}</span>`)}
-        ${r2('Parent ID','#'+pu.id)}
-        ${r2('Placement Source',isFromRecycle?'<span style="color:var(--green)">♻ Recycle queue</span>':'<span style="color:var(--primary)">BFS main queue</span>')}
-        ${r2('Slot','#'+(+slotThatWillBeFilled+1)+' of 2 ('+(+slotThatWillBeFilled===0?'left':'right')+')')}
-        ${r2('Parent Cycles',parentCycleCount)}
-        ${r2('Will trigger cycle?',willCycle?'<span style="color:var(--accent)">Yes — parent will cycle & get recycled</span>':'No')}
-        ${r2('Payment goes to',willCycle&&pu.matrixParent!==ZERO?`<span class="mono">${short(pu.matrixParent)}</span> (overflow)`:`<span class="mono">${short(parent)}</span>`)}
+        ${r2('Matrix Parent', `<span class="mono">${parent}</span>`)}
+        ${r2('Parent ID', '#' + pu.id)}
+        ${r2('Placement Source', isFromRecycle ? '<span style="color:var(--green)">♻ Recycle queue</span>' : '<span style="color:var(--primary)">BFS main queue</span>')}
+        ${r2('Slot', '#' + (+slotThatWillBeFilled + 1) + ' of 2 (' + (+slotThatWillBeFilled === 0 ? 'left' : 'right') + ')')}
+        ${r2('Parent Cycles', parentCycleCount)}
+        ${r2('Will trigger cycle?', willCycle ? '<span style="color:var(--accent)">Yes — parent will cycle & get recycled</span>' : 'No')}
+        ${r2('Payment goes to', willCycle && pu.matrixParent !== ZERO ? `<span class="mono">${short(pu.matrixParent)}</span> (overflow)` : `<span class="mono">${short(parent)}</span>`)}
       </table>
       <p style="margin-top:.65rem;color:var(--muted);font-size:.77rem">* May change if someone registers before you</p>
     </div>`;
-  }catch(e){el.innerHTML='<p style="color:var(--muted)">'+e.message+'</p>';}
-}
+      } catch (e) { el.innerHTML = '<p style="color:var(--muted)">' + e.message + '</p>'; }
+    }
 
-/* ═══ REGISTER ═══ */
-async function doRegister(){
-  const sponsor=document.getElementById('sponsorIn').value.trim();
-  if(!sponsor||!web3.utils.isAddress(sponsor)){toast('Enter a valid sponsor address','e');return;}
-  const btn=document.getElementById('btnReg');
-  btn.disabled=true;btn.innerHTML='<span class="sp"></span> Processing…';
-  const st=document.getElementById('regSt');st.innerHTML='';
-  try{
-    const tx=await contract.methods.register(sponsor).send({from:acct,value:FEE});
-    toast('🎉 Registered successfully!','s');
-    st.innerHTML=`<div class="al al-s">✓ Done! TX: <span class="mono">${tx.transactionHash.slice(0,22)}…</span></div>`;
-    document.getElementById('sponsorIn').value='';
-    await refreshAll();
-    await renderPlacementPreview();
-  }catch(e){
-    toast('Failed: '+e.message,'e');
-    st.innerHTML=`<div class="al al-e">✗ ${e.message}</div>`;
-  }finally{
-    btn.disabled=false;btn.innerHTML='Register Now — 0.001 tBNB';
-  }
-}
+    /* ═══ REGISTER ═══ */
+    async function doRegister() {
+      const sponsor = document.getElementById('sponsorIn').value.trim();
+      if (!sponsor || !web3.utils.isAddress(sponsor)) { toast('Enter a valid sponsor address', 'e'); return; }
+      const btn = document.getElementById('btnReg');
+      btn.disabled = true; btn.innerHTML = '<span class="sp"></span> Processing…';
+      const st = document.getElementById('regSt'); st.innerHTML = '';
+      try {
+        const tx = await contract.methods.register(sponsor).send({ from: acct, value: FEE });
+        toast('🎉 Registered successfully!', 's');
+        st.innerHTML = `<div class="al al-s">✓ Done! TX: <span class="mono">${tx.transactionHash.slice(0, 22)}…</span></div>`;
+        document.getElementById('sponsorIn').value = '';
+        await refreshAll();
+        await renderPlacementPreview();
+      } catch (e) {
+        toast('Failed: ' + e.message, 'e');
+        st.innerHTML = `<div class="al al-e">✗ ${e.message}</div>`;
+      } finally {
+        btn.disabled = false; btn.innerHTML = 'Register Now — 0.001 tBNB';
+      }
+    }
 
-/* ═══ REFERRAL ═══ */
-async function renderReferral(){
-  if(!acct) return;
-  document.getElementById('myAddr').value=acct;
-  const el=document.getElementById('refC');
-  el.innerHTML='<p style="color:var(--muted)"><span class="sp"></span> Loading…</p>';
-  try{
-    const refs=await contract.methods.getDirectReferrals(acct,50).call();
-    if(!refs.length){el.innerHTML='<p style="color:var(--muted)">No direct referrals yet. Share your address!</p>';return;}
-    let html=`<p style="color:var(--muted);margin-bottom:.75rem;font-size:.81rem">${refs.length} direct referral(s)</p>
+    /* ═══ REFERRAL ═══ */
+    async function renderReferral() {
+      if (!acct) return;
+      document.getElementById('myAddr').value = acct;
+      const el = document.getElementById('refC');
+      el.innerHTML = '<p style="color:var(--muted)"><span class="sp"></span> Loading…</p>';
+      try {
+        const refs = await contract.methods.getDirectReferrals(acct, 50).call();
+        if (!refs.length) { el.innerHTML = '<p style="color:var(--muted)">No direct referrals yet. Share your address!</p>'; return; }
+        let html = `<p style="color:var(--muted);margin-bottom:.75rem;font-size:.81rem">${refs.length} direct referral(s)</p>
       <div class="tw"><table>
       <thead><tr><th>#</th><th>Address</th><th>ID</th><th>Cycles</th><th>Copy</th></tr></thead><tbody>`;
-    for(let i=0;i<refs.length;i++){
-      let ru={id:'—',cycleCount:0};
-      try{ru=await contract.methods.getUser(refs[i]).call();}catch(e){}
-      html+=`<tr><td>${i+1}</td><td class="mono">${short(refs[i])}</td><td>#${ru.id}</td><td>${ru.cycleCount}</td>
+        for (let i = 0; i < refs.length; i++) {
+          let ru = { id: '—', cycleCount: 0 };
+          try { ru = await contract.methods.getUser(refs[i]).call(); } catch (e) { }
+          html += `<tr><td>${i + 1}</td><td class="mono">${short(refs[i])}</td><td>#${ru.id}</td><td>${ru.cycleCount}</td>
         <td><button class="bg" onclick="navigator.clipboard.writeText('${refs[i]}').then(()=>toast('Copied','i'))">📋</button></td></tr>`;
+        }
+        html += '</tbody></table></div>';
+        el.innerHTML = html;
+      } catch (e) { el.innerHTML = '<p style="color:var(--red)">' + e.message + '</p>'; }
     }
-    html+='</tbody></table></div>';
-    el.innerHTML=html;
-  }catch(e){el.innerHTML='<p style="color:var(--red)">'+e.message+'</p>';}
-}
 
-/* ═══ NETWORK ═══ */
-async function renderNetwork(){
-  if(!acct) return;
-  const el=document.getElementById('netC');
-  el.innerHTML='<p style="color:var(--muted)"><span class="sp"></span> Loading…</p>';
-  try{
-    const refs=await contract.methods.getDirectReferrals(acct,50).call();
-    if(!refs.length){el.innerHTML='<p style="color:var(--muted)">No referrals yet.</p>';return;}
-    let html='';
-    for(const addr of refs){
-      let ru={id:'—',rank:0,directCount:0,partnersInMatrix:0,cycleCount:0,totalReceived:0,childCount:0};
-      try{ru=await contract.methods.getUser(addr).call();}catch(e){}
-      const rank=+ru.rank;
-      const earned=parseFloat(web3.utils.fromWei(ru.totalReceived,'ether')).toFixed(5);
-      html+=`<div class="nn">
+    /* ═══ NETWORK ═══ */
+    async function renderNetwork() {
+      if (!acct) return;
+      const el = document.getElementById('netC');
+      el.innerHTML = '<p style="color:var(--muted)"><span class="sp"></span> Loading…</p>';
+      try {
+        const refs = await contract.methods.getDirectReferrals(acct, 50).call();
+        if (!refs.length) { el.innerHTML = '<p style="color:var(--muted)">No referrals yet.</p>'; return; }
+        let html = '';
+        for (const addr of refs) {
+          let ru = { id: '—', rank: 0, directCount: 0, partnersInMatrix: 0, cycleCount: 0, totalReceived: 0, childCount: 0 };
+          try { ru = await contract.methods.getUser(addr).call(); } catch (e) { }
+          const rank = +ru.rank;
+          const earned = parseFloat(web3.utils.fromWei(ru.totalReceived, 'ether')).toFixed(5);
+          html += `<div class="nn">
         <div class="nn-top">
           <span class="nn-addr">${short(addr)}</span>
           <span class="rank ${RANK_CLS[rank]}">${RANK_NAMES[rank]}</span>
@@ -853,74 +2251,75 @@ async function renderNetwork(){
           <span>Slots: <strong>${ru.childCount}/2</strong></span>
         </div>
       </div>`;
+        }
+        el.innerHTML = html;
+      } catch (e) { el.innerHTML = '<p style="color:var(--red)">' + e.message + '</p>'; }
     }
-    el.innerHTML=html;
-  }catch(e){el.innerHTML='<p style="color:var(--red)">'+e.message+'</p>';}
-}
 
-/* ═══ EXPLORE ═══ */
-async function loadUsers(){
-  const page=parseInt(document.getElementById('pageIn').value)||0;
-  const PER=10,start=page*PER;
-  const tb=document.getElementById('usersB');
-  tb.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--muted)"><span class="sp"></span> Loading…</td></tr>`;
-  try{
-    const addrs=await contract.methods.getUsers(start,PER).call();
-    if(!addrs.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted)">No more users</td></tr>';return;}
-    let html='';
-    for(let i=0;i<addrs.length;i++){
-      let u={id:'—',directCount:0,partnersInMatrix:0,cycleCount:0,totalReceived:0,rank:0};
-      try{u=await contract.methods.getUser(addrs[i]).call();}catch(e){}
-      const rank=+u.rank;
-      const e=parseFloat(web3.utils.fromWei(u.totalReceived,'ether')).toFixed(5);
-      html+=`<tr>
-        <td>${start+i+1}</td><td class="mono">${short(addrs[i])}</td>
+    /* ═══ EXPLORE ═══ */
+    async function loadUsers() {
+      const page = parseInt(document.getElementById('pageIn').value) || 0;
+      const PER = 10, start = page * PER;
+      const tb = document.getElementById('usersB');
+      tb.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--muted)"><span class="sp"></span> Loading…</td></tr>`;
+      try {
+        const addrs = await contract.methods.getUsers(start, PER).call();
+        if (!addrs.length) { tb.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted)">No more users</td></tr>'; return; }
+        let html = '';
+        for (let i = 0; i < addrs.length; i++) {
+          let u = { id: '—', directCount: 0, partnersInMatrix: 0, cycleCount: 0, totalReceived: 0, rank: 0 };
+          try { u = await contract.methods.getUser(addrs[i]).call(); } catch (e) { }
+          const rank = +u.rank;
+          const e = parseFloat(web3.utils.fromWei(u.totalReceived, 'ether')).toFixed(5);
+          html += `<tr>
+        <td>${start + i + 1}</td><td class="mono">${short(addrs[i])}</td>
         <td>#${u.id}</td><td>${u.directCount}</td>
         <td>${u.partnersInMatrix}</td><td>${u.cycleCount}</td>
         <td>${e}</td>
         <td><span class="rank ${RANK_CLS[rank]}">${RANK_NAMES[rank]}</span></td>
       </tr>`;
+        }
+        tb.innerHTML = html;
+      } catch (e) { tb.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--red)">${e.message}</td></tr>`; }
     }
-    tb.innerHTML=html;
-  }catch(e){tb.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--red)">${e.message}</td></tr>`;}
-}
 
-/* ═══ UTILS ═══ */
-function short(addr){
-  if(!addr||addr===ZERO) return '—';
-  return addr.slice(0,6)+'…'+addr.slice(-4);
-}
-function r2(l,v){
-  return `<tr><td style="color:var(--muted);padding:.38rem 0;width:45%;vertical-align:top">${l}</td><td style="padding:.38rem 0">${v}</td></tr>`;
-}
-function copyEl(id){
-  const el=document.getElementById(id);
-  navigator.clipboard.writeText(el.value||el.textContent).then(()=>toast('Copied!','i'));
-}
-function toast(msg,type='i'){
-  const box=document.getElementById('abox');
-  const id='t'+Date.now();
-  const types={s:'al-s',e:'al-e',i:'al-i'};
-  const div=document.createElement('div');
-  div.id=id;div.className='al '+types[type];
-  div.innerHTML=`<span>${msg}</span><button class="x" onclick="document.getElementById('${id}').remove()">×</button>`;
-  box.prepend(div);
-  setTimeout(()=>{const e=document.getElementById(id);if(e)e.remove();},7000);
-}
+    /* ═══ UTILS ═══ */
+    function short(addr) {
+      if (!addr || addr === ZERO) return '—';
+      return addr.slice(0, 6) + '…' + addr.slice(-4);
+    }
+    function r2(l, v) {
+      return `<tr><td style="color:var(--muted);padding:.38rem 0;width:45%;vertical-align:top">${l}</td><td style="padding:.38rem 0">${v}</td></tr>`;
+    }
+    function copyEl(id) {
+      const el = document.getElementById(id);
+      navigator.clipboard.writeText(el.value || el.textContent).then(() => toast('Copied!', 'i'));
+    }
+    function toast(msg, type = 'i') {
+      const box = document.getElementById('abox');
+      const id = 't' + Date.now();
+      const types = { s: 'al-s', e: 'al-e', i: 'al-i' };
+      const div = document.createElement('div');
+      div.id = id; div.className = 'al ' + types[type];
+      div.innerHTML = `<span>${msg}</span><button class="x" onclick="document.getElementById('${id}').remove()">×</button>`;
+      box.prepend(div);
+      setTimeout(() => { const e = document.getElementById(id); if (e) e.remove(); }, 7000);
+    }
 
-/* ═══ AUTO-INIT ═══ */
-window.addEventListener('load',async()=>{
-  if(typeof window.ethereum!=='undefined'){
-    await init();
-    const a=await window.ethereum.request({method:'eth_accounts'});
-    if(a.length){acct=a[0];afterConnect();await refreshAll();}
-    window.ethereum.on('accountsChanged',async(a)=>{
-      if(a.length){acct=a[0];afterConnect();await refreshAll();}
-      else disconnectWallet();
+    /* ═══ AUTO-INIT ═══ */
+    window.addEventListener('load', async () => {
+      if (typeof window.ethereum !== 'undefined') {
+        await init();
+        const a = await window.ethereum.request({ method: 'eth_accounts' });
+        if (a.length) { acct = a[0]; afterConnect(); await refreshAll(); }
+        window.ethereum.on('accountsChanged', async (a) => {
+          if (a.length) { acct = a[0]; afterConnect(); await refreshAll(); }
+          else disconnectWallet();
+        });
+        window.ethereum.on('chainChanged', () => location.reload());
+      }
     });
-    window.ethereum.on('chainChanged',()=>location.reload());
-  }
-});
-</script>
+  </script>
 </body>
+
 </html>
